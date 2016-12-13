@@ -20,6 +20,8 @@
 				case VirtualKey.App:
 				case VirtualKey.LeftWin:
 				case VirtualKey.RightWin:
+				case VirtualKey.NumPadDiv:
+				case VirtualKey.NumPadEnter:
 					return true;
 				default:
 					return false;
