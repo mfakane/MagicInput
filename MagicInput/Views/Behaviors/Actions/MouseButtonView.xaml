@@ -1,0 +1,258 @@
+﻿<UserControl x:Class="MagicInput.Views.Actions.MouseButtonView"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+			 xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+			 xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
+			 xmlns:a="clr-namespace:MagicInput.Input.Behaviors.Actions;assembly=MagicInput.Input"
+			 mc:Ignorable="d"
+			 d:DesignHeight="300"
+			 d:DesignWidth="300"
+			 d:DataContext="{d:DesignInstance a:MouseButtonAction}">
+	<StackPanel>
+		<GroupBox Header="ボタン入力"
+				  Padding="4"
+				  Margin="0,0,0,8">
+			<StackPanel Orientation="Horizontal">
+				<StackPanel Width="128">
+					<RadioButton GroupName="Kind"
+								 Content="押す"
+								 Margin="0,0,0,4">
+						<i:Interaction.Triggers>
+							<l:LivetDataTrigger Binding="{Binding Kind}"
+												Value="Down">
+								<ei:ChangePropertyAction PropertyName="IsChecked"
+														 Value="True" />
+							</l:LivetDataTrigger>
+							<i:EventTrigger EventName="Checked">
+								<ei:ChangePropertyAction TargetObject="{Binding}"
+														 PropertyName="Kind"
+														 Value="Down" />
+							</i:EventTrigger>
+						</i:Interaction.Triggers>
+					</RadioButton>
+					<RadioButton GroupName="Kind"
+								 Content="離す"
+								 Margin="0,0,0,4">
+						<i:Interaction.Triggers>
+							<l:LivetDataTrigger Binding="{Binding Kind}"
+												Value="Up">
+								<ei:ChangePropertyAction PropertyName="IsChecked"
+														 Value="True" />
+							</l:LivetDataTrigger>
+							<i:EventTrigger EventName="Checked">
+								<ei:ChangePropertyAction TargetObject="{Binding}"
+														 PropertyName="Kind"
+														 Value="Up" />
+							</i:EventTrigger>
+						</i:Interaction.Triggers>
+					</RadioButton>
+					<RadioButton GroupName="Kind"
+								 Content="押して離す">
+						<i:Interaction.Triggers>
+							<l:LivetDataTrigger Binding="{Binding Kind}"
+												Value="DownUp">
+								<ei:ChangePropertyAction PropertyName="IsChecked"
+														 Value="True" />
+							</l:LivetDataTrigger>
+							<i:EventTrigger EventName="Checked">
+								<ei:ChangePropertyAction TargetObject="{Binding}"
+														 PropertyName="Kind"
+														 Value="DownUp" />
+							</i:EventTrigger>
+						</i:Interaction.Triggers>
+					</RadioButton>
+				</StackPanel>
+				<StackPanel>
+					<RadioButton Content="左ボタン"
+								 Margin="0,0,0,4">
+						<i:Interaction.Triggers>
+							<l:LivetDataTrigger Binding="{Binding MouseButton}"
+												Value="0">
+								<ei:ChangePropertyAction PropertyName="IsChecked"
+														 Value="True" />
+							</l:LivetDataTrigger>
+							<i:EventTrigger EventName="Checked">
+								<ei:ChangePropertyAction TargetObject="{Binding}"
+														 PropertyName="MouseButton"
+														 Value="0" />
+							</i:EventTrigger>
+						</i:Interaction.Triggers>
+					</RadioButton>
+					<RadioButton Content="右ボタン"
+								 Margin="0,0,0,4">
+						<i:Interaction.Triggers>
+							<l:LivetDataTrigger Binding="{Binding MouseButton}"
+												Value="1">
+								<ei:ChangePropertyAction PropertyName="IsChecked"
+														 Value="True" />
+							</l:LivetDataTrigger>
+							<i:EventTrigger EventName="Checked">
+								<ei:ChangePropertyAction TargetObject="{Binding}"
+														 PropertyName="MouseButton"
+														 Value="1" />
+							</i:EventTrigger>
+						</i:Interaction.Triggers>
+					</RadioButton>
+					<RadioButton Content="中ボタン"
+								 Margin="0,0,0,4">
+						<i:Interaction.Triggers>
+							<l:LivetDataTrigger Binding="{Binding MouseButton}"
+												Value="2">
+								<ei:ChangePropertyAction PropertyName="IsChecked"
+														 Value="True" />
+							</l:LivetDataTrigger>
+							<i:EventTrigger EventName="Checked">
+								<ei:ChangePropertyAction TargetObject="{Binding}"
+														 PropertyName="MouseButton"
+														 Value="2" />
+							</i:EventTrigger>
+						</i:Interaction.Triggers>
+					</RadioButton>
+					<RadioButton GroupName="Kind"
+								 Content="X1"
+								 Margin="0,0,0,4">
+						<i:Interaction.Triggers>
+							<l:LivetDataTrigger Binding="{Binding MouseButton}"
+												Value="3">
+								<ei:ChangePropertyAction PropertyName="IsChecked"
+														 Value="True" />
+							</l:LivetDataTrigger>
+							<i:EventTrigger EventName="Checked">
+								<ei:ChangePropertyAction TargetObject="{Binding}"
+														 PropertyName="MouseButton"
+														 Value="3" />
+							</i:EventTrigger>
+						</i:Interaction.Triggers>
+					</RadioButton>
+					<RadioButton GroupName="Kind"
+								 Content="X2">
+						<i:Interaction.Triggers>
+							<l:LivetDataTrigger Binding="{Binding MouseButton}"
+												Value="4">
+								<ei:ChangePropertyAction PropertyName="IsChecked"
+														 Value="True" />
+							</l:LivetDataTrigger>
+							<i:EventTrigger EventName="Checked">
+								<ei:ChangePropertyAction TargetObject="{Binding}"
+														 PropertyName="MouseButton"
+														 Value="4" />
+							</i:EventTrigger>
+						</i:Interaction.Triggers>
+					</RadioButton>
+				</StackPanel>
+			</StackPanel>
+		</GroupBox>
+		<GroupBox Header="ホイール入力"
+				  Padding="4"
+				  Margin="0,0,0,8">
+			<StackPanel Orientation="Horizontal">
+				<StackPanel Width="128">
+					<RadioButton GroupName="Kind"
+								 Content="縦ホイール"
+								 Margin="0,0,0,4">
+						<i:Interaction.Triggers>
+							<l:LivetDataTrigger Binding="{Binding Kind}"
+												Value="Wheel">
+								<ei:ChangePropertyAction PropertyName="IsChecked"
+														 Value="True" />
+							</l:LivetDataTrigger>
+							<i:EventTrigger EventName="Checked">
+								<ei:ChangePropertyAction TargetObject="{Binding}"
+														 PropertyName="Kind"
+														 Value="Wheel" />
+							</i:EventTrigger>
+						</i:Interaction.Triggers>
+					</RadioButton>
+					<RadioButton GroupName="Kind"
+								 Content="横ホイール">
+						<i:Interaction.Triggers>
+							<l:LivetDataTrigger Binding="{Binding Kind}"
+												Value="HorizontalWheel">
+								<ei:ChangePropertyAction PropertyName="IsChecked"
+														 Value="True" />
+							</l:LivetDataTrigger>
+							<i:EventTrigger EventName="Checked">
+								<ei:ChangePropertyAction TargetObject="{Binding}"
+														 PropertyName="Kind"
+														 Value="HorizontalWheel" />
+							</i:EventTrigger>
+						</i:Interaction.Triggers>
+					</RadioButton>
+				</StackPanel>
+				<StackPanel Orientation="Horizontal"
+							VerticalAlignment="Top">
+					<Label Content="量:"
+						   Width="16" />
+					<TextBox Margin="8,0,0,0"
+							 Width="48"
+							 Text="{Binding WheelDelta}" />
+				</StackPanel>
+			</StackPanel>
+		</GroupBox>
+		<GroupBox Header="カーソル移動"
+				  Padding="4">
+			<StackPanel Orientation="Horizontal">
+				<StackPanel Width="128">
+					<RadioButton GroupName="Kind"
+								 Content="絶対座標"
+								 Margin="0,0,0,4">
+						<i:Interaction.Triggers>
+							<l:LivetDataTrigger Binding="{Binding Kind}"
+												Value="MoveAbsolute">
+								<ei:ChangePropertyAction PropertyName="IsChecked"
+														 Value="True" />
+							</l:LivetDataTrigger>
+							<i:EventTrigger EventName="Checked">
+								<ei:ChangePropertyAction TargetObject="{Binding}"
+														 PropertyName="Kind"
+														 Value="MoveAbsolute" />
+							</i:EventTrigger>
+						</i:Interaction.Triggers>
+					</RadioButton>
+					<RadioButton GroupName="Kind"
+								 Content="相対座標">
+						<i:Interaction.Triggers>
+							<l:LivetDataTrigger Binding="{Binding Kind}"
+												Value="MoveRelative">
+								<ei:ChangePropertyAction PropertyName="IsChecked"
+														 Value="True" />
+							</l:LivetDataTrigger>
+							<i:EventTrigger EventName="Checked">
+								<ei:ChangePropertyAction TargetObject="{Binding}"
+														 PropertyName="Kind"
+														 Value="MoveRelative" />
+							</i:EventTrigger>
+						</i:Interaction.Triggers>
+					</RadioButton>
+				</StackPanel>
+				<Grid HorizontalAlignment="Left">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition />
+					</Grid.ColumnDefinitions>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="Auto" />
+					</Grid.RowDefinitions>
+					<Label Content="X:"
+						   Width="16" />
+					<TextBox Grid.Column="1"
+							 Margin="8,0,0,8"
+							 Width="48"
+							 Text="{Binding X}" />
+					<Label Grid.Row="1"
+						   Content="Y:"
+						   Width="16" />
+					<TextBox Grid.Column="1"
+							 Grid.Row="1"
+							 Margin="8,0,0,0"
+							 Width="48"
+							 Text="{Binding Y}" />
+				</Grid>
+			</StackPanel>
+		</GroupBox>
+	</StackPanel>
+</UserControl>

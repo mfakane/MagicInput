@@ -1,0 +1,249 @@
+﻿<UserControl x:Class="MagicInput.Views.SequenceBehaviorView"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
+			 xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+			 xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="clr-namespace:MagicInput.ViewModels"
+			 xmlns:v="clr-namespace:MagicInput.Views"
+			 mc:Ignorable="d"
+			 d:DesignHeight="400"
+			 d:DesignWidth="300"
+			 d:DataContext="{d:DesignInstance vm:SequenceBehaviorViewModel}">
+	<UserControl.Resources>
+		<ContextMenu x:Key="AddSequenceContextMenu"
+					 Placement="Right">
+			<MenuItem Header="キー ストローク..."
+					  Command="{v:MethodCommand AddKeyStrokeAction}"
+					  CommandParameter="{Binding Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+			<MenuItem Header="マウス入力..."
+					  Command="{v:MethodCommand AddMouseButtonAction}"
+					  CommandParameter="{Binding Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+			<MenuItem Header="テキスト入力..."
+					  Command="{v:MethodCommand AddTextInputAction}"
+					  CommandParameter="{Binding Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+			<Separator />
+			<MenuItem Header="クリップボードへコピー..."
+					  Command="{v:MethodCommand AddCopyToClipboardAction}"
+					  CommandParameter="{Binding Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+			<MenuItem Header="ファイルを開く..."
+					  Command="{v:MethodCommand AddOpenFileAction}"
+					  CommandParameter="{Binding Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+			<Separator />
+			<MenuItem Header="待機..."
+					  Command="{v:MethodCommand AddWaitAction}"
+					  CommandParameter="{Binding Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+		</ContextMenu>
+	</UserControl.Resources>
+	<i:Interaction.Triggers>
+		<l:InteractionMessageTrigger Messenger="{Binding Messenger}"
+									 MessageKey="SequenceActionViewModel">
+			<l:TransitionInteractionMessageAction WindowType="v:SequenceActionWindow"
+												  Mode="Modal" />
+		</l:InteractionMessageTrigger>
+	</i:Interaction.Triggers>
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition />
+			<RowDefinition />
+			<RowDefinition />
+		</Grid.RowDefinitions>
+		<Label Content="名前:" />
+		<TextBox Grid.Column="1"
+				 Margin="8,0,0,6"
+				 Text="{Binding Behavior.Name, UpdateSourceTrigger=PropertyChanged}" />
+		<Grid Grid.Row="1"
+			  Grid.ColumnSpan="2"
+			  Margin="0,0,0,2">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition />
+			</Grid.RowDefinitions>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition />
+				<ColumnDefinition Width="Auto" />
+			</Grid.ColumnDefinitions>
+			<Label Content="押したときの動作:"
+				   Margin="0,2,0,4" />
+			<ListBox Grid.Row="1"
+					 ItemsSource="{Binding Behavior.KeyDownAction}">
+				<i:Interaction.Behaviors>
+					<v:ItemDragDropBehavior />
+				</i:Interaction.Behaviors>
+				<ListBox.ItemContainerStyle>
+					<Style TargetType="ListBoxItem">
+						<Setter Property="Tag"
+								Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+						<Setter Property="ContextMenu">
+							<Setter.Value>
+								<ContextMenu>
+									<MenuItem Header="編集(_E)..."
+											  DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+											  Command="{v:MethodCommand EditKeyDownAction}"
+											  CommandParameter="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+									<Separator />
+									<MenuItem Header="削除(_D)"
+											  DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+											  Command="{v:MethodCommand RemoveKeyDownAction}"
+											  CommandParameter="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+								</ContextMenu>
+							</Setter.Value>
+						</Setter>
+					</Style>
+				</ListBox.ItemContainerStyle>
+			</ListBox>
+			<StackPanel Grid.Row="1"
+						Grid.Column="1"
+						Margin="8,0,0,0">
+				<Button MinWidth="0"
+						Padding="2"
+						Content="{StaticResource PlusPath}">
+					<i:Interaction.Triggers>
+						<i:EventTrigger EventName="Click">
+							<ei:ChangePropertyAction TargetObject="{StaticResource AddSequenceContextMenu}"
+													 PropertyName="Tag"
+													 Value="{Binding Behavior.KeyDownAction}" />
+							<ei:ChangePropertyAction TargetObject="{StaticResource AddSequenceContextMenu}"
+													 PropertyName="PlacementTarget"
+													 Value="{Binding RelativeSource={RelativeSource AncestorType=Button}}" />
+							<ei:ChangePropertyAction TargetObject="{StaticResource AddSequenceContextMenu}"
+													 PropertyName="IsOpen"
+													 Value="True" />
+						</i:EventTrigger>
+					</i:Interaction.Triggers>
+				</Button>
+			</StackPanel>
+		</Grid>
+		<Grid Grid.Row="2"
+			  Grid.ColumnSpan="2"
+			  Margin="0,2">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition />
+			</Grid.RowDefinitions>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition />
+				<ColumnDefinition Width="Auto" />
+			</Grid.ColumnDefinitions>
+			<Label Content="押し続けているときの動作:"
+				   Margin="0,2,0,4" />
+			<ListBox Grid.Row="1"
+					 ItemsSource="{Binding Behavior.KeyHoldAction}">
+				<i:Interaction.Behaviors>
+					<v:ItemDragDropBehavior />
+				</i:Interaction.Behaviors>
+				<ListBox.ItemContainerStyle>
+					<Style TargetType="ListBoxItem">
+						<Setter Property="Tag"
+								Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+						<Setter Property="ContextMenu">
+							<Setter.Value>
+								<ContextMenu>
+									<MenuItem Header="編集(_E)..."
+											  DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+											  Command="{v:MethodCommand EditKeyDownAction}"
+											  CommandParameter="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+									<Separator />
+									<MenuItem Header="削除(_D)"
+											  DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+											  Command="{v:MethodCommand RemoveKeyDownAction}"
+											  CommandParameter="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+								</ContextMenu>
+							</Setter.Value>
+						</Setter>
+					</Style>
+				</ListBox.ItemContainerStyle>
+			</ListBox>
+			<StackPanel Grid.Row="1"
+						Grid.Column="1"
+						Margin="8,0,0,0">
+				<Button MinWidth="0"
+						Padding="2"
+						Content="{StaticResource PlusPath}">
+					<i:Interaction.Triggers>
+						<i:EventTrigger EventName="Click">
+							<ei:ChangePropertyAction TargetObject="{StaticResource AddSequenceContextMenu}"
+													 PropertyName="Tag"
+													 Value="{Binding Behavior.KeyHoldAction}" />
+							<ei:ChangePropertyAction TargetObject="{StaticResource AddSequenceContextMenu}"
+													 PropertyName="PlacementTarget"
+													 Value="{Binding RelativeSource={RelativeSource AncestorType=Button}}" />
+							<ei:ChangePropertyAction TargetObject="{StaticResource AddSequenceContextMenu}"
+													 PropertyName="IsOpen"
+													 Value="True" />
+						</i:EventTrigger>
+					</i:Interaction.Triggers>
+				</Button>
+			</StackPanel>
+		</Grid>
+		<Grid Grid.Row="3"
+			  Grid.ColumnSpan="2"
+			  Margin="0,2,0,0">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition />
+			</Grid.RowDefinitions>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition />
+				<ColumnDefinition Width="Auto" />
+			</Grid.ColumnDefinitions>
+			<Label Content="放したときの動作:"
+				   Margin="0,2,0,4" />
+			<ListBox Grid.Row="1"
+					 ItemsSource="{Binding Behavior.KeyUpAction}">
+				<i:Interaction.Behaviors>
+					<v:ItemDragDropBehavior />
+				</i:Interaction.Behaviors>
+				<ListBox.ItemContainerStyle>
+					<Style TargetType="ListBoxItem">
+						<Setter Property="Tag"
+								Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+						<Setter Property="ContextMenu">
+							<Setter.Value>
+								<ContextMenu>
+									<MenuItem Header="編集(_E)..."
+											  DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+											  Command="{v:MethodCommand EditKeyDownAction}"
+											  CommandParameter="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+									<Separator />
+									<MenuItem Header="削除(_D)"
+											  DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+											  Command="{v:MethodCommand RemoveKeyDownAction}"
+											  CommandParameter="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+								</ContextMenu>
+							</Setter.Value>
+						</Setter>
+					</Style>
+				</ListBox.ItemContainerStyle>
+			</ListBox>
+			<StackPanel Grid.Row="1"
+						Grid.Column="1"
+						Margin="8,0,0,0">
+				<Button MinWidth="0"
+						Padding="2"
+						Content="{StaticResource PlusPath}">
+					<i:Interaction.Triggers>
+						<i:EventTrigger EventName="Click">
+							<ei:ChangePropertyAction TargetObject="{StaticResource AddSequenceContextMenu}"
+													 PropertyName="Tag"
+													 Value="{Binding Behavior.KeyUpAction}" />
+							<ei:ChangePropertyAction TargetObject="{StaticResource AddSequenceContextMenu}"
+													 PropertyName="PlacementTarget"
+													 Value="{Binding RelativeSource={RelativeSource AncestorType=Button}}" />
+							<ei:ChangePropertyAction TargetObject="{StaticResource AddSequenceContextMenu}"
+													 PropertyName="IsOpen"
+													 Value="True" />
+						</i:EventTrigger>
+					</i:Interaction.Triggers>
+				</Button>
+			</StackPanel>
+		</Grid>
+	</Grid>
+</UserControl>

@@ -1,0 +1,93 @@
+﻿<UserControl x:Class="MagicInput.Views.Actions.KeyStrokeView"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+			 xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+			 xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
+			 xmlns:m="clr-namespace:MagicInput.Models"
+			 xmlns:in="clr-namespace:MagicInput.Input;assembly=MagicInput.Input"
+			 xmlns:a="clr-namespace:MagicInput.Input.Behaviors.Actions;assembly=MagicInput.Input"
+			 xmlns:v="clr-namespace:MagicInput.Views"
+			 mc:Ignorable="d"
+			 d:DesignWidth="300"
+			 d:DataContext="{d:DesignInstance a:KeyStrokeAction}">
+	<UserControl.Resources>
+		<v:Int32Converter x:Key="Int32Converter" />
+		<ObjectDataProvider x:Key="Keys"
+							MethodName="GetValues"
+							ObjectType="in:VirtualKey">
+			<ObjectDataProvider.MethodParameters>
+				<x:Type TypeName="in:VirtualKey" />
+			</ObjectDataProvider.MethodParameters>
+		</ObjectDataProvider>
+	</UserControl.Resources>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<ListBox Margin="0,0,0,8"
+				 ItemsSource="{Binding Source={StaticResource Keys}}"
+				 SelectedItem="{Binding VirtualKey}"
+				 IsSynchronizedWithCurrentItem="True"
+				 Height="240">
+			<ListBox.ItemTemplate>
+				<DataTemplate DataType="m:VirtualKey">
+					<StackPanel Orientation="Horizontal">
+						<TextBlock Text="{Binding StringFormat=X2, Converter={StaticResource Int32Converter}}"
+								   Width="24" />
+						<TextBlock Text="{Binding}" />
+					</StackPanel>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
+		<StackPanel Grid.Row="1">
+			<RadioButton Content="押す"
+						 Margin="0,0,0,4">
+				<i:Interaction.Triggers>
+					<l:LivetDataTrigger Binding="{Binding Kind}"
+										Value="Down">
+						<ei:ChangePropertyAction PropertyName="IsChecked"
+												 Value="True" />
+					</l:LivetDataTrigger>
+					<i:EventTrigger EventName="Checked">
+						<ei:ChangePropertyAction TargetObject="{Binding}"
+												 PropertyName="Kind"
+												 Value="Down" />
+					</i:EventTrigger>
+				</i:Interaction.Triggers>
+			</RadioButton>
+			<RadioButton Content="離す"
+						 Margin="0,0,0,4">
+				<i:Interaction.Triggers>
+					<l:LivetDataTrigger Binding="{Binding Kind}"
+										Value="Up">
+						<ei:ChangePropertyAction PropertyName="IsChecked"
+												 Value="True" />
+					</l:LivetDataTrigger>
+					<i:EventTrigger EventName="Checked">
+						<ei:ChangePropertyAction TargetObject="{Binding}"
+												 PropertyName="Kind"
+												 Value="Up" />
+					</i:EventTrigger>
+				</i:Interaction.Triggers>
+			</RadioButton>
+			<RadioButton Content="押して離す">
+				<i:Interaction.Triggers>
+					<l:LivetDataTrigger Binding="{Binding Kind}"
+										Value="DownUp">
+						<ei:ChangePropertyAction PropertyName="IsChecked"
+												 Value="True" />
+					</l:LivetDataTrigger>
+					<i:EventTrigger EventName="Checked">
+						<ei:ChangePropertyAction TargetObject="{Binding}"
+												 PropertyName="Kind"
+												 Value="DownUp" />
+					</i:EventTrigger>
+				</i:Interaction.Triggers>
+			</RadioButton>
+		</StackPanel>
+	</Grid>
+</UserControl>

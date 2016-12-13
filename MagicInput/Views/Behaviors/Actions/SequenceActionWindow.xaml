@@ -1,0 +1,103 @@
+﻿<Window x:Name="Window"
+		x:Class="MagicInput.Views.SequenceActionWindow"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+		xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:a="clr-namespace:MagicInput.Input.Behaviors.Actions;assembly=MagicInput.Input"
+		xmlns:vm="clr-namespace:MagicInput.ViewModels"
+		xmlns:va="clr-namespace:MagicInput.Views.Actions"
+		mc:Ignorable="d"
+		d:DataContext="{d:DesignInstance Type=vm:SequenceActionViewModel}"
+		Style="{StaticResource {x:Type Window}}"
+		ResizeMode="CanResize"
+		WindowStartupLocation="CenterOwner"
+		Title="シーケンスの編集"
+		SizeToContent="Height"
+		Width="320"
+		MinHeight="240">
+	<Grid Margin="8">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<ComboBox Margin="0,0,0,8"
+				  SelectedValue="{Binding ActionType}"
+				  SelectedValuePath="Tag">
+			<ComboBoxItem Content="キー ストローク"
+						  Tag="{x:Type a:KeyStrokeAction}" />
+			<ComboBoxItem Content="マウス入力"
+						  Tag="{x:Type a:MouseButtonAction}" />
+			<ComboBoxItem Content="テキスト入力"
+						  Tag="{x:Type a:TextInputAction}" />
+			<ComboBoxItem Content="クリップボードへコピー"
+						  Tag="{x:Type a:CopyToClipboardAction}" />
+			<ComboBoxItem Content="ファイルを開く"
+						  Tag="{x:Type a:OpenFileAction}" />
+			<ComboBoxItem Content="待機"
+						  Tag="{x:Type a:WaitAction}" />
+		</ComboBox>
+		<ContentControl Grid.Row="1"
+						Margin="0,0,0,8"
+						Content="{Binding Action}">
+			<ContentControl.Resources>
+				<DataTemplate DataType="{x:Type a:KeyStrokeAction}">
+					<va:KeyStrokeView />
+				</DataTemplate>
+				<DataTemplate DataType="{x:Type a:MouseButtonAction}">
+					<va:MouseButtonView />
+				</DataTemplate>
+				<DataTemplate DataType="{x:Type a:TextInputAction}">
+					<TextBox Text="{Binding Text}"
+							 AcceptsTab="True"
+							 AcceptsReturn="True"
+							 VerticalScrollBarVisibility="Visible"
+							 TextWrapping="Wrap"
+							 Height="240" />
+				</DataTemplate>
+				<DataTemplate DataType="{x:Type a:CopyToClipboardAction}">
+					<TextBox Text="{Binding Text}"
+							 AcceptsTab="True"
+							 AcceptsReturn="True"
+							 VerticalScrollBarVisibility="Visible"
+							 TextWrapping="Wrap"
+							 Height="240" />
+				</DataTemplate>
+				<DataTemplate DataType="{x:Type a:OpenFileAction}">
+					<va:OpenFileView />
+				</DataTemplate>
+				<DataTemplate DataType="{x:Type a:WaitAction}">
+					<va:WaitView />
+				</DataTemplate>
+			</ContentControl.Resources>
+		</ContentControl>
+		<StackPanel Grid.Row="2"
+					HorizontalAlignment="Right"
+					Orientation="Horizontal">
+			<Button Margin="0,0,8,0"
+					IsDefault="True"
+					Content="OK">
+				<i:Interaction.Triggers>
+					<i:EventTrigger EventName="Click">
+						<ei:ChangePropertyAction TargetName="Window"
+												 PropertyName="DialogResult"
+												 Value="True" />
+					</i:EventTrigger>
+				</i:Interaction.Triggers>
+			</Button>
+			<Button IsCancel="True"
+					Content="キャンセル">
+				<i:Interaction.Triggers>
+					<i:EventTrigger EventName="Click">
+						<ei:ChangePropertyAction TargetName="Window"
+												 PropertyName="DialogResult"
+												 Value="False" />
+					</i:EventTrigger>
+				</i:Interaction.Triggers>
+			</Button>
+		</StackPanel>
+	</Grid>
+</Window>

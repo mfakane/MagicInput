@@ -1,0 +1,3 @@
+[submodule "Linearstar.Core.Input"]
+	path = Linearstar.Core.Input
+	url = https://github.com/mfcorlib/input

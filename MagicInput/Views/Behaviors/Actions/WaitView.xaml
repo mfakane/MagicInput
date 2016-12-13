@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="MagicInput.Views.Actions.WaitView"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:a="clr-namespace:MagicInput.Input.Behaviors.Actions;assembly=MagicInput.Input"
+			 xmlns:v="clr-namespace:MagicInput.Views"
+			 mc:Ignorable="d"
+			 d:DesignWidth="300"
+			 d:DataContext="{d:DesignInstance a:WaitAction}">
+	<StackPanel>
+		<Label Content="待機時間 (ミリ秒):"
+			   Margin="0,0,0,8" />
+		<TextBox Text="{Binding MillisecondsTimeout}"
+				 Width="64"
+				 HorizontalAlignment="Left"
+				 InputScope="Number"
+				 InputMethod.IsInputMethodEnabled="False"
+				 v:TextBoxOptions.IsNumeric="True" />
+	</StackPanel>
+</UserControl>
