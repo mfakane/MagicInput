@@ -8,7 +8,7 @@ using MagicInput.Input;
 
 namespace MagicInput.ViewModels
 {
-	class KeyProfileViewModel : ViewModelBase
+	public class KeyProfileViewModel : ViewModelBase
 	{
 		public KeyMapViewModel CurrentKeyMap
 		{

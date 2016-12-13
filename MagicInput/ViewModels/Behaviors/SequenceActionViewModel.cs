@@ -5,7 +5,7 @@ using MagicInput.Input.Behaviors.Actions;
 
 namespace MagicInput.ViewModels
 {
-	class SequenceActionViewModel : ViewModelBase
+	public class SequenceActionViewModel : ViewModelBase
 	{
 		readonly Dictionary<Type, SequenceAction> actions = new Dictionary<Type, SequenceAction>();
 

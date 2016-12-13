@@ -3,7 +3,7 @@ using MagicInput.Input;
 
 namespace MagicInput.ViewModels
 {
-	class KeyMapViewModel : ViewModelBase
+	public class KeyMapViewModel : ViewModelBase
 	{
 		public KeyProfileViewModel Profile { get; }
 		public KeyMap KeyMap { get; }

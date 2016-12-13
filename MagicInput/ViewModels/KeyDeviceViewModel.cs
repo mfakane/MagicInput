@@ -2,7 +2,7 @@
 
 namespace MagicInput.ViewModels
 {
-	class KeyDeviceViewModel : ViewModelBase
+	public class KeyDeviceViewModel : ViewModelBase
 	{
 		public KeyDeviceSetViewModel DeviceSet { get; }
 		public KeyDevice Device { get; }

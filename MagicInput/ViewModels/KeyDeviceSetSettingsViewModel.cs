@@ -10,7 +10,7 @@ using MagicInput.Input.Behaviors;
 
 namespace MagicInput.ViewModels
 {
-	class KeyDeviceSetSettingsViewModel : ViewModelBase
+	public class KeyDeviceSetSettingsViewModel : ViewModelBase
 	{
 		public MainViewModel Main { get; }
 		public KeyDeviceSet DeviceSet { get; }
@@ -114,7 +114,7 @@ namespace MagicInput.ViewModels
 		}
 	}
 
-	class KeyDeviceSettingsViewModel : ViewModelBase
+	public class KeyDeviceSettingsViewModel : ViewModelBase
 	{
 		bool isLoaded;
 		IDisposable previewHandle;
@@ -239,7 +239,7 @@ namespace MagicInput.ViewModels
 		}
 	}
 
-	class KeyProfileSettingsViewModel : ViewModelBase
+	public class KeyProfileSettingsViewModel : ViewModelBase
 	{
 		public KeyProfile Profile { get; }
 

@@ -6,7 +6,7 @@ using MagicInput.Models;
 
 namespace MagicInput.ViewModels
 {
-	class MainViewModel : ViewModelBase
+	public class MainViewModel : ViewModelBase
 	{
 		public MainModel Model { get; }
 		public IReadOnlyList<KeyDeviceSetViewModel> DeviceSets { get; }

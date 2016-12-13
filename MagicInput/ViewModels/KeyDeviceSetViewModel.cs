@@ -5,7 +5,7 @@ using MagicInput.Input;
 
 namespace MagicInput.ViewModels
 {
-	class KeyDeviceSetViewModel : ViewModelBase
+	public class KeyDeviceSetViewModel : ViewModelBase
 	{
 		public MainViewModel Main { get; }
 		public KeyDeviceSet DeviceSet { get; }

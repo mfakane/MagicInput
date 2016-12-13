@@ -5,7 +5,7 @@ using MagicInput.Input.Behaviors;
 
 namespace MagicInput.ViewModels
 {
-	class SwitchKeyMapBehaviorViewModel : KeyBehaviorViewModel
+	public class SwitchKeyMapBehaviorViewModel : KeyBehaviorViewModel
 	{
 		public SwitchKeyMapBehavior SwitchKeyMapBehavior => (SwitchKeyMapBehavior)Behavior;
 		public IList<KeyMap> KeyMaps => SwitchKeyMapBehavior.KeyMap.Profile.KeyMaps.Where(i => i != SwitchKeyMapBehavior.KeyMap).ToArray();

@@ -5,7 +5,7 @@ using Livet;
 
 namespace MagicInput.ViewModels
 {
-	class ViewModelBase : ViewModel
+	public class ViewModelBase : ViewModel
 	{
 		readonly Dictionary<string, object> values = new Dictionary<string, object>();
 

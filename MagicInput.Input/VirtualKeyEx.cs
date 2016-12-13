@@ -1,6 +1,6 @@
 ﻿namespace MagicInput.Input
 {
-	static class VirtualKeyEx
+	public static class VirtualKeyEx
 	{
 		public static bool IsExtendedKey(this VirtualKey virtualKey)
 		{

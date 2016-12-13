@@ -6,7 +6,7 @@ using MagicInput.Input.Behaviors.Actions;
 
 namespace MagicInput.ViewModels
 {
-	class SequenceBehaviorViewModel : KeyBehaviorViewModel
+	public class SequenceBehaviorViewModel : KeyBehaviorViewModel
 	{
 		SequenceBehavior SequenceBehavior => (SequenceBehavior)Behavior;
 

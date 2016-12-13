@@ -7,7 +7,7 @@ using MagicInput.Input.Behaviors;
 
 namespace MagicInput.ViewModels
 {
-	class KeyBehaviorViewModel : ViewModelBase
+	public class KeyBehaviorViewModel : ViewModelBase
 	{
 		readonly Dictionary<Type, KeyBehavior> behaviorInstances = new Dictionary<Type, KeyBehavior>();
 
