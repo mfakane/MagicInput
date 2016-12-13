@@ -148,12 +148,12 @@
 								<ContextMenu>
 									<MenuItem Header="編集(_E)..."
 											  DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-											  Command="{v:MethodCommand EditKeyDownAction}"
+											  Command="{v:MethodCommand EditKeyHoldAction}"
 											  CommandParameter="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
 									<Separator />
 									<MenuItem Header="削除(_D)"
 											  DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-											  Command="{v:MethodCommand RemoveKeyDownAction}"
+											  Command="{v:MethodCommand RemoveKeyHoldAction}"
 											  CommandParameter="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
 								</ContextMenu>
 							</Setter.Value>
@@ -210,12 +210,12 @@
 								<ContextMenu>
 									<MenuItem Header="編集(_E)..."
 											  DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-											  Command="{v:MethodCommand EditKeyDownAction}"
+											  Command="{v:MethodCommand EditKeyUpAction}"
 											  CommandParameter="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
 									<Separator />
 									<MenuItem Header="削除(_D)"
 											  DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-											  Command="{v:MethodCommand RemoveKeyDownAction}"
+											  Command="{v:MethodCommand RemoveKeyUpAction}"
 											  CommandParameter="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
 								</ContextMenu>
 							</Setter.Value>
