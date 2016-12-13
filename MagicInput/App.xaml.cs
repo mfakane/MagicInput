@@ -1,5 +1,7 @@
 ﻿using System.Windows;
+using System.Windows.Interop;
 using Livet;
+using MagicInput.Views;
 
 namespace MagicInput
 {
@@ -11,6 +13,11 @@ namespace MagicInput
 		void Application_Startup(object sender, StartupEventArgs e)
 		{
 			DispatcherHelper.UIDispatcher = Dispatcher;
+
+			var window = new MainWindow();
+			var helper = new WindowInteropHelper(window);
+
+			helper.EnsureHandle();
 		}
 	}
 }

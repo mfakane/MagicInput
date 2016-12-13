@@ -15,7 +15,8 @@
 		Style="{StaticResource {x:Type Window}}"
 		Title="MagicInput"
 		Height="520"
-		Width="640">
+		Width="640"
+		SourceInitialized="Window_SourceInitialized">
 	<Window.Resources>
 		<v:TypeDisplayNameConverter x:Key="TypeDisplayNameConverter" />
 	</Window.Resources>
@@ -23,11 +24,6 @@
 		<vm:MainViewModel />
 	</Window.DataContext>
 	<i:Interaction.Triggers>
-		<i:EventTrigger EventName="Loaded">
-			<l:LivetCallMethodAction MethodTarget="{Binding Model}"
-									 MethodName="Load"
-									 MethodParameter="{Binding ElementName=Window}" />
-		</i:EventTrigger>
 		<i:EventTrigger EventName="Unloaded">
 			<l:DataContextDisposeAction />
 		</i:EventTrigger>
@@ -38,8 +34,8 @@
 		</l:InteractionMessageTrigger>
 		<l:InteractionMessageTrigger Messenger="{Binding Messenger}"
 									 MessageKey="Show">
-			<ei:ChangePropertyAction PropertyName="Visibility"
-									 Value="Visible" />
+			<l:LivetCallMethodAction MethodTarget="{Binding ElementName=Window}"
+									 MethodName="Show" />
 			<l:WindowInteractionMessageAction InvokeActionOnlyWhenWindowIsActive="False">
 				<l:DirectInteractionMessage>
 					<l:WindowActionMessage Action="Normal" />
