@@ -37,6 +37,6 @@ namespace MagicInput.Input.Behaviors
 			KeyMap.Profile.PopKeyMap();
 
 		public override string ToString() =>
-			"キーマップ: " + KeyMap.Profile.KeyMaps.FirstOrDefault(i => i.Guid == TargetKeyMapGuid)?.Name;
+			"キーマップ: " + KeyMap?.Profile.KeyMaps.FirstOrDefault(i => i.Guid == TargetKeyMapGuid)?.Name;
 	}
 }
