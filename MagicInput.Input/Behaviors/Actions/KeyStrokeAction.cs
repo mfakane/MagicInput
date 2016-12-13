@@ -10,9 +10,9 @@ namespace MagicInput.Input.Behaviors.Actions
 		public override void DoAction()
 		{
 			if (Kind == KeyStrokeActionKind.DownUp)
-				SendInput.Send(new SendKeyboard((short)VirtualKey, KeyboardEventFlags.None), new SendKeyboard((short)VirtualKey, KeyboardEventFlags.KeyUp));
+				SendInput.Send(new SendKeyboard((short)VirtualKey, VirtualKey.IsExtendedKey() ? KeyboardEventFlags.ExtendedKey : KeyboardEventFlags.None), new SendKeyboard((short)VirtualKey, KeyboardEventFlags.KeyUp | (VirtualKey.IsExtendedKey() ? KeyboardEventFlags.ExtendedKey : KeyboardEventFlags.None)));
 			else
-				SendInput.Send(new SendKeyboard((short)VirtualKey, Kind == KeyStrokeActionKind.Up ? KeyboardEventFlags.KeyUp : KeyboardEventFlags.None));
+				SendInput.Send(new SendKeyboard((short)VirtualKey, (Kind == KeyStrokeActionKind.Up ? KeyboardEventFlags.KeyUp : KeyboardEventFlags.None) | (VirtualKey.IsExtendedKey() ? KeyboardEventFlags.ExtendedKey : KeyboardEventFlags.None)));
 		}
 
 		public override string ToString() =>

@@ -97,6 +97,7 @@
     <Compile Include="TextMatchMethod.cs" />
     <Compile Include="TreeCollection.cs" />
     <Compile Include="VirtualKey.cs" />
+    <Compile Include="VirtualKeyEx.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
