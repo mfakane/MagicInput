@@ -19,6 +19,7 @@ namespace MagicInput.Input.RawInput
 		public override string Name => RawDevice.ProductName ?? $"VID_{RawDevice.VendorId:X4}&PID_{RawDevice.ProductId:X4}";
 		public override string ManufacturerName => RawDevice.ManufacturerName;
 		public override string Description => DevicePath;
+		public override bool IsConnected => RawDevice.IsConnected;
 
 		public override KeyDeviceKind Kind =>
 			RawDevice.DeviceType == RawInputDeviceType.Mouse ? KeyDeviceKind.Mouse :
@@ -139,6 +140,7 @@ namespace MagicInput.Input.RawInput
 											 .Concat(activeBehaviors)
 											 .Distinct()
 											 .Where(i => i.Device.PhysicalDevice is RawKeyPhysicalDevice rkpd
+													  && rkpd.IsConnected
 													  && rkpd.DevicePath == rid.Device?.DevicePath
 													  && i.Key is RawKeyInput rki
 													  && rki.IsMatch(rid)))
@@ -153,10 +155,11 @@ namespace MagicInput.Input.RawInput
 				void OnKeyUp(RawInputData rid)
 				{
 					foreach (var i in activeBehaviors.Where(i => i.Device.PhysicalDevice is RawKeyPhysicalDevice rkpd
-																		  && rkpd.DevicePath == rid.Device?.DevicePath
-																		  && i.Key is RawKeyInput rki
-																		  && rki.IsMatch(rid))
-																 .ToArray())
+															  && rkpd.IsConnected
+															  && rkpd.DevicePath == rid.Device?.DevicePath
+															  && i.Key is RawKeyInput rki
+															  && rki.IsMatch(rid))
+													 .ToArray())
 					{
 						i.DoKeyUp();
 						activeBehaviors.Remove(i);

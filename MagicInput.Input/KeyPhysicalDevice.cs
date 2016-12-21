@@ -11,6 +11,7 @@ namespace MagicInput.Input
 		public abstract string Name { get; }
 		public abstract string ManufacturerName { get; }
 		public abstract string Description { get; }
+		public abstract bool IsConnected { get; }
 		public abstract KeyDeviceKind Kind { get; }
 
 		public virtual KeyDevice CreateDevice() =>
