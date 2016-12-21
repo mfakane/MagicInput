@@ -75,6 +75,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy $(TargetPath) $(SolutionDir)MagicInput\bin\$(ConfigurationName)</PostBuildEvent>
+    <PostBuildEvent>copy "$(TargetDir)$(TargetName)$(TargetExt)" "$(SolutionDir)MagicInput\bin\$(ConfigurationName)"
+copy "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)MagicInput\bin\$(ConfigurationName)"</PostBuildEvent>
   </PropertyGroup>
 </Project>

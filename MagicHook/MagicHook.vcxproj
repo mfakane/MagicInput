@@ -61,7 +61,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetPath)" "$(SolutionDir)MagicInput\bin\$(ConfigurationName)"</Command>
+      <Command>copy "$(TargetDir)$(TargetName)$(TargetExt)" "$(SolutionDir)MagicInput\bin\$(ConfigurationName)"
+copy "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)MagicInput\bin\$(ConfigurationName)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -81,7 +82,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetPath)" "$(SolutionDir)MagicInput\bin\$(ConfigurationName)"</Command>
+      <Command>copy "$(TargetDir)$(TargetName)$(TargetExt)" "$(SolutionDir)MagicInput\bin\$(ConfigurationName)"
+copy "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)MagicInput\bin\$(ConfigurationName)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
