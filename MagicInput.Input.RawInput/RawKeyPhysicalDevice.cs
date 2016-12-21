@@ -10,30 +10,29 @@ namespace MagicInput.Input.RawInput
 {
 	public class RawKeyPhysicalDevice : KeyPhysicalDevice
 	{
-		readonly Lazy<RawInputDevice> rawDevice;
-
-		RawInputDevice RawDevice => rawDevice.Value;
+		RawInputDevice RawDevice => RawInputDevice.GetDevices().FirstOrDefault(i => i.DevicePath == DevicePath);
 
 		public string DevicePath { get; private set; }
 
-		public override string Name => RawDevice.ProductName ?? $"VID_{RawDevice.VendorId:X4}&PID_{RawDevice.ProductId:X4}";
-		public override string ManufacturerName => RawDevice.ManufacturerName;
+		public override string Name => RawDevice == null ? null : RawDevice.ProductName ?? $"VID_{RawDevice.VendorId:X4}&PID_{RawDevice.ProductId:X4}";
+		public override string ManufacturerName => RawDevice?.ManufacturerName;
 		public override string Description => DevicePath;
-		public override bool IsConnected => RawDevice.IsConnected;
+		public override bool IsConnected => RawDevice?.IsConnected ?? false;
 
 		public override KeyDeviceKind Kind =>
-			RawDevice.DeviceType == RawInputDeviceType.Mouse ? KeyDeviceKind.Mouse :
-			RawDevice.DeviceType == RawInputDeviceType.Keyboard ? KeyDeviceKind.Keyboard : KeyDeviceKind.Unknown;
+			RawDevice?.DeviceType == RawInputDeviceType.Mouse ? KeyDeviceKind.Mouse :
+			RawDevice?.DeviceType == RawInputDeviceType.Keyboard ? KeyDeviceKind.Keyboard : KeyDeviceKind.Unknown;
 
-		public RawKeyPhysicalDevice() =>
-			rawDevice = new Lazy<RawInputDevice>(() => RawInputDevice.GetDevices().First(i => i.DevicePath == DevicePath));
+		public RawKeyPhysicalDevice()
+		{
+		}
 
 		public RawKeyPhysicalDevice(RawInputDevice rawDevice)
 			: this() =>
 			DevicePath = rawDevice.DevicePath;
 
 		public override KeyDevice CreateDevice() =>
-			RawDevice.DeviceType == RawInputDeviceType.Mouse
+			RawDevice?.DeviceType == RawInputDeviceType.Mouse
 				? new KeyDevice(this, new[]
 				{
 					new RawKeyInput(RawKeyMouseButton.Left),
