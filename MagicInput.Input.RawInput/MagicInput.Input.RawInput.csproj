@@ -55,6 +55,7 @@
     <Compile Include="LowLevelMouseHandler.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RawInputDeviceEventArgs.cs" />
     <Compile Include="RawInputEventArgs.cs" />
     <Compile Include="RawKeyProvider.cs" />
     <Compile Include="RawKeyInput.cs" />

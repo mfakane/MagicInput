@@ -18,6 +18,7 @@ namespace MagicInput.Input.RawInput
 		static extern bool UnloadHook();
 
 		const int MSGFLT_ALLOW = 1;
+		const int WM_INPUT_DEVICE_CHANGE = 0xFE;
 		const int WM_INPUT = 0xFF;
 		const int WM_APP = 0x8000;
 		const int WM_APP_MOUSE = WM_APP + 1;
@@ -27,6 +28,8 @@ namespace MagicInput.Input.RawInput
 
 		public event EventHandler<RawInputEventArgs> PreviewInput;
 		public event EventHandler<RawInputEventArgs> Input;
+		public event EventHandler<RawInputDeviceEventArgs> DeviceConnected;
+		public event EventHandler<RawInputDeviceEventArgs> DeviceDisconnected;
 
 		public InputHookServer()
 		{
@@ -40,7 +43,7 @@ namespace MagicInput.Input.RawInput
 			});
 			ChangeWindowMessageFilterEx(Handle, WM_APP_KEYBOARD, MSGFLT_ALLOW, IntPtr.Zero);
 
-			RawInputDevice.RegisterDevice(HidUsageAndPage.Keyboard, RawInputDeviceFlags.InputSink, Handle);
+			RawInputDevice.RegisterDevice(HidUsageAndPage.Keyboard, RawInputDeviceFlags.InputSink | RawInputDeviceFlags.DevNotify, Handle);
 			LoadHook(Handle, false, true);
 		}
 
@@ -50,10 +53,35 @@ namespace MagicInput.Input.RawInput
 		protected virtual void OnInput(RawInputEventArgs e) =>
 			Input?.Invoke(this, e);
 
+		protected virtual void OnDeviceConnected(RawInputDeviceEventArgs e) =>
+			DeviceConnected?.Invoke(this, e);
+
+		protected virtual void OnDeviceDisconnected(RawInputDeviceEventArgs e) =>
+			DeviceDisconnected?.Invoke(this, e);
+
 		protected override void WndProc(ref Message m)
 		{
 			switch (m.Msg)
 			{
+				case WM_INPUT_DEVICE_CHANGE:
+					const int GIDC_ARRIVAL = 1;
+					const int GIDC_REMOVAL = 2;
+
+					switch (m.WParam.ToInt32())
+					{
+						case GIDC_ARRIVAL:
+							OnDeviceConnected(new RawInputDeviceEventArgs(RawInputDevice.FromHandle(m.LParam)));
+							m.Result = IntPtr.Zero;
+
+							return;
+						case GIDC_REMOVAL:
+							OnDeviceDisconnected(new RawInputDeviceEventArgs(m.LParam));
+							m.Result = IntPtr.Zero;
+
+							return;
+					}
+
+					break;
 				case WM_INPUT:
 					{
 						var rid = RawInputData.FromHandle(m.LParam);

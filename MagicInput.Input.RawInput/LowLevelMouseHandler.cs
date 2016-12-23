@@ -27,6 +27,7 @@ namespace MagicInput.Input.RawInput
 		[SuppressUnmanagedCodeSecurity, DllImport("user32", SetLastError = true)]
 		static extern bool SetCursorPos(int x, int y);
 
+		const int WM_INPUT_DEVICE_CHANGE = 0xFE;
 		const int WH_MOUSE_LL = 14;
 
 		[StructLayout(LayoutKind.Sequential)]

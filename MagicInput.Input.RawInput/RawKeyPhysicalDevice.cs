@@ -10,7 +10,14 @@ namespace MagicInput.Input.RawInput
 {
 	public class RawKeyPhysicalDevice : KeyPhysicalDevice
 	{
-		RawInputDevice RawDevice => RawInputDevice.GetDevices().FirstOrDefault(i => i.DevicePath == DevicePath);
+		RawInputDevice rawDevice;
+		RawInputDevice RawDevice
+		{
+			get => rawDevice ?? (rawDevice = RawInputDevice.GetDevices().FirstOrDefault(i => i.DevicePath == DevicePath));
+			set => rawDevice = value;
+		}
+
+		IntPtr? Handle => rawDevice?.Handle;
 
 		public string DevicePath { get; private set; }
 
@@ -111,6 +118,19 @@ namespace MagicInput.Input.RawInput
 						}
 					};
 
+					hookServer.DeviceConnected += (sender, e) =>
+					{
+						foreach (var i in devices)
+							if (i.PhysicalDevice.DevicePath == e.Device.DevicePath)
+								i.PhysicalDevice.RawDevice = e.Device;
+					};
+					hookServer.DeviceDisconnected += (sender, e) =>
+					{
+						foreach (var i in devices)
+							if (i.PhysicalDevice.Handle is IntPtr handle &&
+								handle == e.Handle)
+								i.PhysicalDevice.RawDevice = null;
+					};
 					hookServer.PreviewInput += PreviewInputHandler;
 					hookServer.Input += (sender, e) =>
 					{
