@@ -1,5 +1,8 @@
-﻿namespace MagicInput.Input
+﻿using MsgPack.Serialization;
+
+namespace MagicInput.Input
 {
+	[MessagePackEnum(SerializationMethod = EnumSerializationMethod.ByUnderlyingValue)]
 	public enum VirtualKey : short
 	{
 		Backspace = 8,
