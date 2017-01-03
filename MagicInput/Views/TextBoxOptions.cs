@@ -31,7 +31,7 @@ namespace MagicInput.Views
 			textBox.Text = string.Join(null, textBox.Text?.Where(char.IsDigit).DefaultIfEmpty('0') ?? EnumerableEx.Return('0'));
 		}
 
-		public static bool GetIsNumeric(DependencyObject obj) => (bool)obj.GetValue(IsNumericProperty);
-		public static void SetIsNumeric(DependencyObject obj, bool value) => obj.SetValue(IsNumericProperty, value);
+		public static bool GetIsNumeric(TextBox obj) => (bool)obj.GetValue(IsNumericProperty);
+		public static void SetIsNumeric(TextBox obj, bool value) => obj.SetValue(IsNumericProperty, value);
 	}
 }
