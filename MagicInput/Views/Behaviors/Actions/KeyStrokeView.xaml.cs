@@ -1,6 +1,4 @@
-﻿using System;
-using System.Windows.Controls;
-using MagicInput.Models;
+﻿using System.Windows.Controls;
 
 namespace MagicInput.Views.Actions
 {
