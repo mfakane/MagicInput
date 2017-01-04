@@ -1,12 +1,18 @@
-﻿using MsgPack.Serialization;
+﻿using System.ComponentModel;
+using MsgPack.Serialization;
 
 namespace MagicInput.Input.Behaviors.Actions
 {
 	[MessagePackRuntimeType]
-	public abstract class SequenceAction
+	public abstract class SequenceAction : INotifyPropertyChanged
 	{
+		public event PropertyChangedEventHandler PropertyChanged;
+
 		[MessagePackIgnore]
 		public SequenceBehavior Behavior { get; set; }
+
+		protected void OnPropertyChanged(PropertyChangedEventArgs e) =>
+			PropertyChanged?.Invoke(this, e);
 
 		public abstract void DoAction();
 

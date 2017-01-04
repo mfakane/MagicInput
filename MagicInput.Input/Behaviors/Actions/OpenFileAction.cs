@@ -4,7 +4,7 @@ using System.IO;
 
 namespace MagicInput.Input.Behaviors.Actions
 {
-	public class OpenFileAction : SequenceAction, INotifyPropertyChanged
+	public class OpenFileAction : SequenceAction
 	{
 		string _fileName;
 		public string FileName
@@ -18,10 +18,6 @@ namespace MagicInput.Input.Behaviors.Actions
 		}
 
 		public string Arguments { get; set; }
-
-		public event PropertyChangedEventHandler PropertyChanged;
-		protected void OnPropertyChanged(PropertyChangedEventArgs e) =>
-			PropertyChanged?.Invoke(this, e);
 
 		public override void DoAction() =>
 			Process.Start(new ProcessStartInfo(FileName, Arguments));
