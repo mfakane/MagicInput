@@ -18,7 +18,7 @@ namespace MagicInput.Input.Behaviors.Actions
 			}
 		}
 
-		public KeyStrokeActionKind Kind { get; set; }
+		public KeyStrokeActionKind Kind { get; set; } = KeyStrokeActionKind.DownUp;
 
 		public override void DoAction()
 		{
