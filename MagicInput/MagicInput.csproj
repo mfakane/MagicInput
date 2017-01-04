@@ -123,6 +123,8 @@
       <DependentUpon>SwitchKeyMapBehaviorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\CompareConverter.cs" />
+    <Compile Include="Views\KeyStrokeBox.cs" />
+    <Compile Include="Views\ListBoxOptions.cs" />
     <Compile Include="Views\MethodCommand.cs" />
     <Compile Include="Views\ItemDragDropBehavior.cs" />
     <Compile Include="Views\NewItemPlaceholderStyleSelector.cs" />
@@ -133,6 +135,14 @@
     <Compile Include="ViewModels\KeyDeviceViewModel.cs" />
     <Compile Include="ViewModels\KeyMapViewModel.cs" />
     <Compile Include="ViewModels\KeyProfileViewModel.cs" />
+    <Page Include="Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Generic.KeyStrokeBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Behaviors\Actions\OpenFileView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

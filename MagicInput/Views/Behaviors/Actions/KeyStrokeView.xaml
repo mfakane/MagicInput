@@ -25,12 +25,17 @@
 	</UserControl.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
 			<RowDefinition />
 			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
-		<ListBox Margin="0,0,0,8"
+		<v:KeyStrokeBox Margin="0,0,0,8"
+						VirtualKeys="{Binding VirtualKeys}" />
+		<ListBox Grid.Row="1"
+				 Margin="0,0,0,8"
 				 ItemsSource="{Binding Source={StaticResource Keys}}"
-				 SelectedItem="{Binding VirtualKey}"
+				 v:ListBoxOptions.SelectedItems="{Binding VirtualKeys}"
+				 SelectionMode="Extended"
 				 IsSynchronizedWithCurrentItem="True"
 				 Height="240">
 			<ListBox.ItemTemplate>
@@ -43,7 +48,7 @@
 				</DataTemplate>
 			</ListBox.ItemTemplate>
 		</ListBox>
-		<StackPanel Grid.Row="1">
+		<StackPanel Grid.Row="2">
 			<RadioButton Content="押す"
 						 Margin="0,0,0,4">
 				<i:Interaction.Triggers>
