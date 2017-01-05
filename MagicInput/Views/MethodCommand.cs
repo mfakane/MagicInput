@@ -20,7 +20,10 @@ namespace MagicInput.Views
 		public override object ProvideValue(IServiceProvider serviceProvider)
 		{
 			var targetInfo = (IProvideValueTarget)serviceProvider.GetService(typeof(IProvideValueTarget));
-			var targetObject = (FrameworkElement)targetInfo.TargetObject;
+
+			if (!(targetInfo.TargetObject is FrameworkElement targetObject))
+				return this;
+
 			var command = new ListenerCommand<object>(p =>
 			{
 				var dataContext = targetObject.DataContext;
