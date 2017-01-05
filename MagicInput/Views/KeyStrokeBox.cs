@@ -61,7 +61,26 @@ namespace MagicInput.Views
 		{
 			VirtualKeys = currentModifiers.Concat(currentKey == Key.None ? Enumerable.Empty<Key>() : new[] { currentKey })
 										  .Select(i => (VirtualKey)KeyInterop.VirtualKeyFromKey(i))
+										  .Select(RemoveLeftRight)
 										  .ToArray();
+		}
+
+		static VirtualKey RemoveLeftRight(VirtualKey key)
+		{
+			switch (key)
+			{
+				case VirtualKey.LeftCtrl:
+				case VirtualKey.RightCtrl:
+					return VirtualKey.Ctrl;
+				case VirtualKey.LeftShift:
+				case VirtualKey.RightShift:
+					return VirtualKey.Shift;
+				case VirtualKey.LeftAlt:
+				case VirtualKey.RightAlt:
+					return VirtualKey.Alt;
+				default:
+					return key;
+			}
 		}
 
 		bool IsModifierKey(Key key) =>
