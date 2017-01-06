@@ -28,13 +28,5 @@ namespace MagicInput.Views
 			else if (e.NewValue is KeyProfileViewModel profile)
 				ViewModel.SelectedProfile = profile;
 		}
-
-		void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
-		{
-			var tabControl = (TabControl)sender;
-
-			if (tabControl.SelectedItem is KeyMapViewModel kmvm)
-				ViewModel.SelectedProfile.CurrentKeyMap = kmvm;
-		}
 	}
 }

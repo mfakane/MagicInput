@@ -115,104 +115,108 @@
 								Content="{StaticResource PlusPath}"
 								Command="{v:MethodCommand AddDevice}" />
 					</StackPanel>
-					<Grid Grid.Column="1"
-						  Grid.RowSpan="2"
-						  Margin="8,0,0,0"
-						  d:DataContext="{d:DesignInstance vm:KeyDeviceSettingsViewModel}"
-						  DataContext="{Binding SelectedItem, ElementName=DevicesListBox}"
-						  IsEnabled="{Binding Converter={StaticResource CompareConverter}, ConverterParameter=!null}">
-						<Grid.RowDefinitions>
-							<RowDefinition Height="Auto" />
-							<RowDefinition Height="Auto" />
-							<RowDefinition />
-						</Grid.RowDefinitions>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition />
-							<ColumnDefinition Width="Auto" />
-						</Grid.ColumnDefinitions>
-						<StackPanel Grid.ColumnSpan="2">
-							<Label Content="デバイス名:"
-								   Margin="0,0,0,4" />
-							<TextBox Margin="0,0,0,8"
-									 Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
-
-							<Label Content="物理デバイス:"
-								   Margin="0,0,0,4" />
-							<ComboBox Margin="0,0,0,8"
-									  ItemsSource="{Binding DataContext.AvailablePhysicalDevices, RelativeSource={RelativeSource AncestorType=Window}}"
-									  SelectedItem="{Binding PhysicalDevice}">
-								<ComboBox.ItemTemplate>
-									<DataTemplate DataType="{x:Type in:KeyPhysicalDevice}">
-										<StackPanel>
-											<TextBlock Text="{Binding}" />
-											<TextBlock Text="{Binding DevicePath}"
-													   Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
-										</StackPanel>
-									</DataTemplate>
-								</ComboBox.ItemTemplate>
-							</ComboBox>
-
-							<Label Content="使用するキー:"
-								   Margin="0,0,0,4" />
-						</StackPanel>
-						<TextBox Text="ここにキー入力して追加"
-								 IsReadOnly="True"
-								 Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"
-								 Margin="0,0,0,8"
-								 Grid.ColumnSpan="2"
-								 Grid.Row="1">
-							<i:Interaction.Triggers>
-								<i:EventTrigger EventName="GotFocus">
-									<ei:ChangePropertyAction TargetObject="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"
-															 PropertyName="IsKeyAddMode"
-															 Value="True" />
-									<ei:ChangePropertyAction PropertyName="Text"
-															 Value="{x:Null}" />
-								</i:EventTrigger>
-								<i:EventTrigger EventName="LostFocus">
-									<ei:ChangePropertyAction TargetObject="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"
-															 PropertyName="IsKeyAddMode"
-															 Value="False" />
-									<ei:ChangePropertyAction PropertyName="Text"
-															 Value="ここにキー入力して追加" />
-								</i:EventTrigger>
-							</i:Interaction.Triggers>
-						</TextBox>
-						<ListBox Name="KeysListBox"
-								 Grid.Row="2"
-								 IsSynchronizedWithCurrentItem="True"
-								 SelectedItem="{Binding SelectedKey}"
-								 ItemsSource="{Binding Keys}">
-							<i:Interaction.Behaviors>
-								<v:ItemDragDropBehavior />
-							</i:Interaction.Behaviors>
-							<ListBox.ItemTemplate>
-								<DataTemplate DataType="{x:Type in:KeyInput}">
-									<StackPanel Orientation="Horizontal">
-										<TextBlock Text="{Binding DisplayCode}"
-												   Width="24" />
-										<TextBlock Text="{Binding}" />
-									</StackPanel>
-								</DataTemplate>
-							</ListBox.ItemTemplate>
-						</ListBox>
-						<StackPanel Grid.Row="2"
-									Grid.Column="1"
+					<ContentControl Grid.Column="1"
+									Grid.RowSpan="2"
 									Margin="8,0,0,0"
-									IsEnabled="{Binding SelectedItem, ElementName=KeysListBox, Converter={StaticResource CompareConverter}, ConverterParameter=!null}">
-							<Button Content="削除"
-									Margin="0,0,0,8"
-									Command="{v:MethodCommand RemoveKey}"
-									CommandParameter="{Binding SelectedItem, ElementName=KeysListBox}" />
-							<Button Content="上へ"
-									Margin="0,0,0,8"
-									Command="{v:MethodCommand MoveKeyUp}"
-									CommandParameter="{Binding SelectedItem, ElementName=KeysListBox}" />
-							<Button Content="下へ"
-									Command="{v:MethodCommand MoveKeyDown}"
-									CommandParameter="{Binding SelectedItem, ElementName=KeysListBox}" />
-						</StackPanel>
-					</Grid>
+									Content="{Binding SelectedItem, ElementName=DevicesListBox}"
+									IsEnabled="{Binding Converter={StaticResource CompareConverter}, ConverterParameter=!null}">
+						<ContentControl.ContentTemplate>
+							<DataTemplate DataType="{x:Type vm:KeyDeviceSettingsViewModel}">
+								<Grid>
+									<Grid.RowDefinitions>
+										<RowDefinition Height="Auto" />
+										<RowDefinition Height="Auto" />
+										<RowDefinition />
+									</Grid.RowDefinitions>
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition />
+										<ColumnDefinition Width="Auto" />
+									</Grid.ColumnDefinitions>
+									<StackPanel Grid.ColumnSpan="2">
+										<Label Content="デバイス名:"
+											   Margin="0,0,0,4" />
+										<TextBox Margin="0,0,0,8"
+												 Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+
+										<Label Content="物理デバイス:"
+											   Margin="0,0,0,4" />
+										<ComboBox Margin="0,0,0,8"
+												  ItemsSource="{Binding DataContext.AvailablePhysicalDevices, RelativeSource={RelativeSource AncestorType=Window}}"
+												  SelectedItem="{Binding PhysicalDevice}">
+											<ComboBox.ItemTemplate>
+												<DataTemplate DataType="{x:Type in:KeyPhysicalDevice}">
+													<StackPanel>
+														<TextBlock Text="{Binding}" />
+														<TextBlock Text="{Binding DevicePath}"
+																   Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+													</StackPanel>
+												</DataTemplate>
+											</ComboBox.ItemTemplate>
+										</ComboBox>
+
+										<Label Content="使用するキー:"
+											   Margin="0,0,0,4" />
+									</StackPanel>
+									<TextBox Text="ここにキー入力して追加"
+											 Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"
+											 Margin="0,0,0,8"
+											 Grid.ColumnSpan="2"
+											 Grid.Row="1">
+										<i:Interaction.Triggers>
+											<i:EventTrigger EventName="GotFocus">
+												<ei:ChangePropertyAction TargetObject="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"
+																		 PropertyName="IsKeyAddMode"
+																		 Value="True" />
+												<ei:ChangePropertyAction PropertyName="Text"
+																		 Value="{x:Null}" />
+											</i:EventTrigger>
+											<i:EventTrigger EventName="LostFocus">
+												<ei:ChangePropertyAction TargetObject="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"
+																		 PropertyName="IsKeyAddMode"
+																		 Value="False" />
+												<ei:ChangePropertyAction PropertyName="Text"
+																		 Value="ここにキー入力して追加" />
+											</i:EventTrigger>
+										</i:Interaction.Triggers>
+									</TextBox>
+									<ListBox Name="KeysListBox"
+											 Grid.Row="2"
+											 IsSynchronizedWithCurrentItem="True"
+											 SelectedItem="{Binding SelectedKey}"
+											 ItemsSource="{Binding Keys}">
+										<i:Interaction.Behaviors>
+											<v:ItemDragDropBehavior />
+										</i:Interaction.Behaviors>
+										<ListBox.ItemTemplate>
+											<DataTemplate DataType="{x:Type in:KeyInput}">
+												<StackPanel Orientation="Horizontal">
+													<TextBlock Text="{Binding DisplayCode}"
+															   Width="24" />
+													<TextBlock Text="{Binding}" />
+												</StackPanel>
+											</DataTemplate>
+										</ListBox.ItemTemplate>
+									</ListBox>
+									<StackPanel Grid.Row="2"
+												Grid.Column="1"
+												Margin="8,0,0,0"
+												IsEnabled="{Binding SelectedItem, ElementName=KeysListBox, Converter={StaticResource CompareConverter}, ConverterParameter=!null}">
+										<Button Content="削除"
+												Margin="0,0,0,8"
+												Command="{v:MethodCommand RemoveKey}"
+												CommandParameter="{Binding SelectedItem, ElementName=KeysListBox}" />
+										<Button Content="上へ"
+												Margin="0,0,0,8"
+												Command="{v:MethodCommand MoveKeyUp}"
+												CommandParameter="{Binding SelectedItem, ElementName=KeysListBox}" />
+										<Button Content="下へ"
+												Command="{v:MethodCommand MoveKeyDown}"
+												CommandParameter="{Binding SelectedItem, ElementName=KeysListBox}" />
+									</StackPanel>
+								</Grid>
+							</DataTemplate>
+						</ContentControl.ContentTemplate>
+					</ContentControl>
 				</Grid>
 			</TabItem>
 			<TabItem Header="プロファイル">

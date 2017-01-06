@@ -154,150 +154,212 @@
 				<Run Text="{Binding SelectedProfile.DeviceSet.DeviceSet.Name}" /><Run Text=": " /><Run Text="{Binding SelectedProfile.Profile.Name}" />
 			</TextBlock>
 		</Grid>
-		<TabControl Grid.Row="1"
-					Grid.Column="1"
-					Margin="0,0,0,8"
-					ItemsSource="{Binding SelectedProfile.KeyMaps}"
-					SelectedItem="{Binding SelectedProfile.CurrentKeyMap, Mode=OneWay}"
-					IsSynchronizedWithCurrentItem="True"
-					SelectionChanged="TabControl_SelectionChanged">
-			<TabControl.ItemContainerStyleSelector>
-				<v:NewItemPlaceholderStyleSelector>
-					<v:NewItemPlaceholderStyleSelector.PlaceholderStyle>
-						<Style TargetType="TabItem">
-							<Setter Property="ToolTip"
-									Value="新しいキーマップ" />
-						</Style>
-					</v:NewItemPlaceholderStyleSelector.PlaceholderStyle>
-					<v:NewItemPlaceholderStyleSelector.ItemStyle>
-						<Style TargetType="TabItem">
-							<Setter Property="ContextMenu">
-								<Setter.Value>
-									<ContextMenu>
-										<MenuItem Header="名前の変更(_M)">
+		<ContentControl Grid.Row="1"
+						Grid.Column="1"
+						Margin="0,0,0,8"
+						Content="{Binding SelectedProfile}">
+			<ContentControl.ContentTemplate>
+				<DataTemplate DataType="{x:Type vm:KeyProfileViewModel}">
+					<TabControl ItemsSource="{Binding KeyMaps}"
+								SelectedItem="{Binding CurrentKeyMap}"
+								IsSynchronizedWithCurrentItem="True">
+						<TabControl.ItemContainerStyleSelector>
+							<v:NewItemPlaceholderStyleSelector>
+								<v:NewItemPlaceholderStyleSelector.PlaceholderStyle>
+									<Style TargetType="TabItem">
+										<Setter Property="ToolTip"
+												Value="新しいキーマップ" />
+									</Style>
+								</v:NewItemPlaceholderStyleSelector.PlaceholderStyle>
+								<v:NewItemPlaceholderStyleSelector.ItemStyle>
+									<Style TargetType="TabItem">
+										<Setter Property="ContextMenu">
+											<Setter.Value>
+												<ContextMenu>
+													<MenuItem Header="名前の変更(_M)">
+														<i:Interaction.Triggers>
+															<i:EventTrigger EventName="Click">
+																<ei:ChangePropertyAction TargetObject="{Binding}"
+																						 PropertyName="IsChangingName"
+																						 Value="True" />
+															</i:EventTrigger>
+														</i:Interaction.Triggers>
+													</MenuItem>
+													<Separator />
+													<MenuItem Header="削除(_D)"
+															  Command="{v:MethodCommand Profile.RemoveKeyMap}"
+															  CommandParameter="{Binding}"
+															  IsEnabled="{Binding Profile.KeyMaps.Count, Converter={StaticResource CompareConverter}, ConverterParameter=&gt;1}" />
+												</ContextMenu>
+											</Setter.Value>
+										</Setter>
+									</Style>
+								</v:NewItemPlaceholderStyleSelector.ItemStyle>
+							</v:NewItemPlaceholderStyleSelector>
+						</TabControl.ItemContainerStyleSelector>
+						<TabControl.ItemTemplateSelector>
+							<v:NewItemPlaceholderTemplateSelector>
+								<v:NewItemPlaceholderTemplateSelector.PlaceholderTemplate>
+									<DataTemplate>
+										<ContentControl Content="{StaticResource PlusPath}"
+														Margin="-2,2,-2,0">
 											<i:Interaction.Triggers>
-												<i:EventTrigger EventName="Click">
-													<ei:ChangePropertyAction TargetObject="{Binding}"
-																			 PropertyName="IsChangingName"
-																			 Value="True" />
-												</i:EventTrigger>
+												<l:LivetDataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=TabItem}}"
+																	Value="True">
+													<l:LivetCallMethodAction MethodTarget="{Binding DataContext.SelectedProfile, ElementName=Window}"
+																			 MethodName="AddKeyMap" />
+												</l:LivetDataTrigger>
 											</i:Interaction.Triggers>
-										</MenuItem>
-										<Separator />
-										<MenuItem Header="削除(_D)"
-												  Command="{v:MethodCommand Profile.RemoveKeyMap}"
-												  CommandParameter="{Binding}"
-												  IsEnabled="{Binding Profile.KeyMaps.Count, Converter={StaticResource CompareConverter}, ConverterParameter=&gt;1}" />
-									</ContextMenu>
-								</Setter.Value>
-							</Setter>
-						</Style>
-					</v:NewItemPlaceholderStyleSelector.ItemStyle>
-				</v:NewItemPlaceholderStyleSelector>
-			</TabControl.ItemContainerStyleSelector>
-			<TabControl.ItemTemplateSelector>
-				<v:NewItemPlaceholderTemplateSelector>
-					<v:NewItemPlaceholderTemplateSelector.PlaceholderTemplate>
-						<DataTemplate>
-							<ContentControl Content="{StaticResource PlusPath}"
-											Margin="-2,2,-2,0">
-								<i:Interaction.Triggers>
-									<l:LivetDataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=TabItem}}"
-														Value="True">
-										<l:LivetCallMethodAction MethodTarget="{Binding DataContext.SelectedProfile, ElementName=Window}"
-																 MethodName="AddKeyMap" />
-									</l:LivetDataTrigger>
-								</i:Interaction.Triggers>
-							</ContentControl>
-						</DataTemplate>
-					</v:NewItemPlaceholderTemplateSelector.PlaceholderTemplate>
-					<v:NewItemPlaceholderTemplateSelector.ItemTemplate>
-						<DataTemplate DataType="{x:Type vm:KeyMapViewModel}">
-							<Grid>
-								<TextBlock Text="{Binding Name}" />
-								<TextBox Margin="-4,-1,-4,-2"
-										 Visibility="{Binding IsChangingName, Converter={StaticResource BooleanToVisibilityConverter}}">
-									<i:Interaction.Triggers>
-										<l:LivetDataTrigger Binding="{Binding IsChangingName}"
-															Value="True">
-											<ei:ChangePropertyAction PropertyName="Text"
-																	 Value="{Binding Name}" />
-											<l:LivetCallMethodAction MethodTarget="{Binding RelativeSource={RelativeSource AncestorType=TextBox}}"
-																	 MethodName="SelectAll" />
-											<l:SetFocusAction />
-										</l:LivetDataTrigger>
-										<i:EventTrigger EventName="LostFocus">
-											<ei:ChangePropertyAction TargetObject="{Binding}"
-																	 PropertyName="IsChangingName"
-																	 Value="False" />
-										</i:EventTrigger>
-										<ei:KeyTrigger Key="Escape"
-													   ActiveOnFocus="True">
-											<ei:ChangePropertyAction TargetObject="{Binding}"
-																	 PropertyName="IsChangingName"
-																	 Value="False" />
-										</ei:KeyTrigger>
-										<ei:KeyTrigger Key="Enter"
-													   ActiveOnFocus="True">
-											<ei:ChangePropertyAction TargetObject="{Binding}"
-																	 PropertyName="Name"
-																	 Value="{Binding Text, RelativeSource={RelativeSource AncestorType=TextBox}}" />
-											<ei:ChangePropertyAction TargetObject="{Binding}"
-																	 PropertyName="IsChangingName"
-																	 Value="False" />
-										</ei:KeyTrigger>
-									</i:Interaction.Triggers>
-								</TextBox>
-							</Grid>
-						</DataTemplate>
-					</v:NewItemPlaceholderTemplateSelector.ItemTemplate>
-				</v:NewItemPlaceholderTemplateSelector>
-			</TabControl.ItemTemplateSelector>
-			<TabControl.ContentTemplateSelector>
-				<v:NewItemPlaceholderTemplateSelector>
-					<v:NewItemPlaceholderTemplateSelector.ItemTemplate>
-						<DataTemplate DataType="{x:Type vm:KeyMapViewModel}">
-							<Grid>
-								<Grid.ColumnDefinitions>
-									<ColumnDefinition Width="216" />
-									<ColumnDefinition />
-								</Grid.ColumnDefinitions>
-								<Grid.Resources>
-									<CollectionViewSource x:Key="BehaviorsCollectionViewSource"
-														  IsLiveGroupingRequested="True"
-														  Source="{Binding Behaviors}">
-										<CollectionViewSource.LiveGroupingProperties>
-											Behavior.Device
-										</CollectionViewSource.LiveGroupingProperties>
-										<CollectionViewSource.GroupDescriptions>
-											<PropertyGroupDescription PropertyName="Behavior.Device" />
-										</CollectionViewSource.GroupDescriptions>
-									</CollectionViewSource>
-								</Grid.Resources>
-								<ListView Name="BehaviorsListView"
-										  Margin="0,0,8,0"
-										  ItemsSource="{Binding Source={StaticResource BehaviorsCollectionViewSource}}"
-										  SelectedItem="{Binding SelectedBehavior}"
-										  IsSynchronizedWithCurrentItem="True">
-									<ListView.ItemContainerStyle>
-										<Style TargetType="ListViewItem">
-											<Setter Property="Padding"
-													Value="1" />
-										</Style>
-									</ListView.ItemContainerStyle>
-									<ListView.ItemTemplate>
-										<DataTemplate DataType="{x:Type vm:KeyBehaviorViewModel}">
-											<Grid>
+										</ContentControl>
+									</DataTemplate>
+								</v:NewItemPlaceholderTemplateSelector.PlaceholderTemplate>
+								<v:NewItemPlaceholderTemplateSelector.ItemTemplate>
+									<DataTemplate DataType="{x:Type vm:KeyMapViewModel}">
+										<Grid>
+											<TextBlock Text="{Binding Name}" />
+											<TextBox Margin="-4,-1,-4,-2"
+													 Visibility="{Binding IsChangingName, Converter={StaticResource BooleanToVisibilityConverter}}">
 												<i:Interaction.Triggers>
-													<i:EventTrigger EventName="Loaded">
-														<l:LivetCallMethodAction MethodTarget="{Binding}"
-																				 MethodName="Load"
-																				 MethodParameter="{Binding RelativeSource={RelativeSource Self}}" />
+													<l:LivetDataTrigger Binding="{Binding IsChangingName}"
+																		Value="True">
+														<ei:ChangePropertyAction PropertyName="Text"
+																				 Value="{Binding Name}" />
+														<l:LivetCallMethodAction MethodTarget="{Binding RelativeSource={RelativeSource AncestorType=TextBox}}"
+																				 MethodName="SelectAll" />
+														<l:SetFocusAction />
+													</l:LivetDataTrigger>
+													<i:EventTrigger EventName="LostFocus">
+														<ei:ChangePropertyAction TargetObject="{Binding}"
+																				 PropertyName="IsChangingName"
+																				 Value="False" />
 													</i:EventTrigger>
-													<i:EventTrigger EventName="Unloaded">
-														<l:DataContextDisposeAction />
-													</i:EventTrigger>
+													<ei:KeyTrigger Key="Escape"
+																   ActiveOnFocus="True">
+														<ei:ChangePropertyAction TargetObject="{Binding}"
+																				 PropertyName="IsChangingName"
+																				 Value="False" />
+													</ei:KeyTrigger>
+													<ei:KeyTrigger Key="Enter"
+																   ActiveOnFocus="True">
+														<ei:ChangePropertyAction TargetObject="{Binding}"
+																				 PropertyName="Name"
+																				 Value="{Binding Text, RelativeSource={RelativeSource AncestorType=TextBox}}" />
+														<ei:ChangePropertyAction TargetObject="{Binding}"
+																				 PropertyName="IsChangingName"
+																				 Value="False" />
+													</ei:KeyTrigger>
 												</i:Interaction.Triggers>
+											</TextBox>
+										</Grid>
+									</DataTemplate>
+								</v:NewItemPlaceholderTemplateSelector.ItemTemplate>
+							</v:NewItemPlaceholderTemplateSelector>
+						</TabControl.ItemTemplateSelector>
+						<TabControl.ContentTemplateSelector>
+							<v:NewItemPlaceholderTemplateSelector>
+								<v:NewItemPlaceholderTemplateSelector.ItemTemplate>
+									<DataTemplate DataType="{x:Type vm:KeyMapViewModel}">
+										<Grid>
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="216" />
+												<ColumnDefinition />
+											</Grid.ColumnDefinitions>
+											<Grid.Resources>
+												<CollectionViewSource x:Key="BehaviorsCollectionViewSource"
+																	  IsLiveGroupingRequested="True"
+																	  Source="{Binding Behaviors}">
+													<CollectionViewSource.LiveGroupingProperties>
+														Behavior.Device
+													</CollectionViewSource.LiveGroupingProperties>
+													<CollectionViewSource.GroupDescriptions>
+														<PropertyGroupDescription PropertyName="Behavior.Device" />
+													</CollectionViewSource.GroupDescriptions>
+												</CollectionViewSource>
+											</Grid.Resources>
+											<ListView Name="BehaviorsListView"
+													  Margin="0,0,8,0"
+													  ItemsSource="{Binding Source={StaticResource BehaviorsCollectionViewSource}}"
+													  SelectedItem="{Binding SelectedBehavior}"
+													  IsSynchronizedWithCurrentItem="True">
+												<ListView.ItemContainerStyle>
+													<Style TargetType="ListViewItem">
+														<Setter Property="Padding"
+																Value="1" />
+													</Style>
+												</ListView.ItemContainerStyle>
+												<ListView.ItemTemplate>
+													<DataTemplate DataType="{x:Type vm:KeyBehaviorViewModel}">
+														<Grid>
+															<i:Interaction.Triggers>
+																<i:EventTrigger EventName="Loaded">
+																	<l:LivetCallMethodAction MethodTarget="{Binding}"
+																							 MethodName="Load"
+																							 MethodParameter="{Binding RelativeSource={RelativeSource Self}}" />
+																</i:EventTrigger>
+																<i:EventTrigger EventName="Unloaded">
+																	<l:DataContextDisposeAction />
+																</i:EventTrigger>
+															</i:Interaction.Triggers>
+															<Grid.ColumnDefinitions>
+																<ColumnDefinition Width="Auto" />
+																<ColumnDefinition />
+															</Grid.ColumnDefinitions>
+															<Grid.RowDefinitions>
+																<RowDefinition Height="Auto" />
+																<RowDefinition />
+															</Grid.RowDefinitions>
+															<Border CornerRadius="4"
+																	BorderThickness="2"
+																	BorderBrush="Black"
+																	MinWidth="32"
+																	Height="32"
+																	Margin="0,0,4,0"
+																	Padding="2"
+																	Grid.RowSpan="2">
+																<TextBlock Text="{Binding Behavior.Key.ShortName}"
+																		   FontSize="13.5"
+																		   HorizontalAlignment="Center"
+																		   VerticalAlignment="Center" />
+															</Border>
+															<TextBlock Text="{Binding Behavior.Name}"
+																	   Grid.Column="1" />
+															<TextBlock Text="{Binding Behavior}"
+																	   Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"
+																	   Grid.Column="1"
+																	   Grid.Row="1" />
+														</Grid>
+													</DataTemplate>
+												</ListView.ItemTemplate>
+												<ListView.GroupStyle>
+													<GroupStyle>
+														<GroupStyle.HeaderTemplate>
+															<DataTemplate>
+																<TextBlock Text="{Binding Name.Name}"
+																		   FontWeight="SemiBold"
+																		   Margin="1" />
+															</DataTemplate>
+														</GroupStyle.HeaderTemplate>
+														<GroupStyle.ContainerStyle>
+															<Style TargetType="GroupItem">
+																<Setter Property="Margin"
+																		Value="0,0,0,8" />
+																<Setter Property="Template">
+																	<Setter.Value>
+																		<ControlTemplate TargetType="GroupItem">
+																			<StackPanel>
+																				<ContentPresenter x:Name="PART_Header" />
+																				<ItemsPresenter x:Name="ItemsPresenter" />
+																			</StackPanel>
+																		</ControlTemplate>
+																	</Setter.Value>
+																</Setter>
+															</Style>
+														</GroupStyle.ContainerStyle>
+													</GroupStyle>
+												</ListView.GroupStyle>
+											</ListView>
+											<Grid Grid.Column="1"
+												  DataContext="{Binding SelectedItem, ElementName=BehaviorsListView}">
 												<Grid.ColumnDefinitions>
 													<ColumnDefinition Width="Auto" />
 													<ColumnDefinition />
@@ -306,99 +368,42 @@
 													<RowDefinition Height="Auto" />
 													<RowDefinition />
 												</Grid.RowDefinitions>
-												<Border CornerRadius="4"
-														BorderThickness="2"
-														BorderBrush="Black"
-														MinWidth="32"
-														Height="32"
-														Margin="0,0,4,0"
-														Padding="2"
-														Grid.RowSpan="2">
-													<TextBlock Text="{Binding Behavior.Key.ShortName}"
-															   FontSize="13.5"
-															   HorizontalAlignment="Center"
-															   VerticalAlignment="Center" />
-												</Border>
-												<TextBlock Text="{Binding Behavior.Name}"
-														   Grid.Column="1" />
-												<TextBlock Text="{Binding Behavior}"
-														   Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"
-														   Grid.Column="1"
-														   Grid.Row="1" />
+												<ComboBox Margin="0,0,0,8"
+														  Grid.ColumnSpan="2"
+														  ItemsSource="{Binding Behavior.Key.SupportedTypes}"
+														  SelectedItem="{Binding BehaviorType}">
+													<ComboBox.ItemTemplate>
+														<DataTemplate>
+															<TextBlock Text="{Binding Converter={StaticResource TypeDisplayNameConverter}}" />
+														</DataTemplate>
+													</ComboBox.ItemTemplate>
+												</ComboBox>
+												<ContentControl Grid.Row="1"
+																Grid.ColumnSpan="2"
+																Content="{Binding}">
+													<ContentControl.Resources>
+														<DataTemplate DataType="{x:Type vm:KeyBehaviorViewModel}">
+															<TextBlock Text="切り替え前のキーマップ、もしくは既定のキー動作にフォールバックします。"
+																	   TextWrapping="Wrap" />
+														</DataTemplate>
+														<DataTemplate DataType="{x:Type vm:SequenceBehaviorViewModel}">
+															<v:SequenceBehaviorView />
+														</DataTemplate>
+														<DataTemplate DataType="{x:Type vm:SwitchKeyMapBehaviorViewModel}">
+															<v:SwitchKeyMapBehaviorView />
+														</DataTemplate>
+													</ContentControl.Resources>
+												</ContentControl>
 											</Grid>
-										</DataTemplate>
-									</ListView.ItemTemplate>
-									<ListView.GroupStyle>
-										<GroupStyle>
-											<GroupStyle.HeaderTemplate>
-												<DataTemplate>
-													<TextBlock Text="{Binding Name.Name}"
-															   FontWeight="SemiBold"
-															   Margin="1" />
-												</DataTemplate>
-											</GroupStyle.HeaderTemplate>
-											<GroupStyle.ContainerStyle>
-												<Style TargetType="GroupItem">
-													<Setter Property="Margin"
-															Value="0,0,0,8" />
-													<Setter Property="Template">
-														<Setter.Value>
-															<ControlTemplate TargetType="GroupItem">
-																<StackPanel>
-																	<ContentPresenter x:Name="PART_Header" />
-																	<ItemsPresenter x:Name="ItemsPresenter" />
-																</StackPanel>
-															</ControlTemplate>
-														</Setter.Value>
-													</Setter>
-												</Style>
-											</GroupStyle.ContainerStyle>
-										</GroupStyle>
-									</ListView.GroupStyle>
-								</ListView>
-								<Grid Grid.Column="1"
-									  DataContext="{Binding SelectedItem, ElementName=BehaviorsListView}">
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition Width="Auto" />
-										<ColumnDefinition />
-									</Grid.ColumnDefinitions>
-									<Grid.RowDefinitions>
-										<RowDefinition Height="Auto" />
-										<RowDefinition />
-									</Grid.RowDefinitions>
-									<ComboBox Margin="0,0,0,8"
-											  Grid.ColumnSpan="2"
-											  ItemsSource="{Binding Behavior.Key.SupportedTypes}"
-											  SelectedItem="{Binding BehaviorType}">
-										<ComboBox.ItemTemplate>
-											<DataTemplate>
-												<TextBlock Text="{Binding Converter={StaticResource TypeDisplayNameConverter}}" />
-											</DataTemplate>
-										</ComboBox.ItemTemplate>
-									</ComboBox>
-									<ContentControl Grid.Row="1"
-													Grid.ColumnSpan="2"
-													Content="{Binding}">
-										<ContentControl.Resources>
-											<DataTemplate DataType="{x:Type vm:KeyBehaviorViewModel}">
-												<TextBlock Text="切り替え前のキーマップ、もしくは既定のキー動作にフォールバックします。"
-														   TextWrapping="Wrap" />
-											</DataTemplate>
-											<DataTemplate DataType="{x:Type vm:SequenceBehaviorViewModel}">
-												<v:SequenceBehaviorView />
-											</DataTemplate>
-											<DataTemplate DataType="{x:Type vm:SwitchKeyMapBehaviorViewModel}">
-												<v:SwitchKeyMapBehaviorView />
-											</DataTemplate>
-										</ContentControl.Resources>
-									</ContentControl>
-								</Grid>
-							</Grid>
-						</DataTemplate>
-					</v:NewItemPlaceholderTemplateSelector.ItemTemplate>
-				</v:NewItemPlaceholderTemplateSelector>
-			</TabControl.ContentTemplateSelector>
-		</TabControl>
+										</Grid>
+									</DataTemplate>
+								</v:NewItemPlaceholderTemplateSelector.ItemTemplate>
+							</v:NewItemPlaceholderTemplateSelector>
+						</TabControl.ContentTemplateSelector>
+					</TabControl>
+				</DataTemplate>
+			</ContentControl.ContentTemplate>
+		</ContentControl>
 		<StackPanel Grid.Row="2"
 					Orientation="Horizontal">
 			<Button MinWidth="0"
