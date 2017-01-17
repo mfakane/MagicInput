@@ -192,6 +192,7 @@ namespace MagicInput.ViewModels
 		{
 			isLoaded = false;
 			previewHandle = null;
+			base.Dispose(disposing);
 		}
 
 		IDisposable CreatePreview() =>
