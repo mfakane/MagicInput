@@ -89,14 +89,14 @@ namespace MagicInput.Input.RawInput
 
 						OnPreviewInput(e);
 
-						switch (rid.Type)
-						{
-							case RawInputDeviceType.Keyboard:
-								if (!e.Handled)
+						if (!e.Handled)
+							switch (rid.Type)
+							{
+								case RawInputDeviceType.Keyboard:
 									keyboardQueue.Add((Environment.TickCount + 25, rid));
 
-								break;
-						}
+									break;
+							}
 
 						break;
 					}

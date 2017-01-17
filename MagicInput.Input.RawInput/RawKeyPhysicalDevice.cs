@@ -38,6 +38,18 @@ namespace MagicInput.Input.RawInput
 			: this() =>
 			DevicePath = rawDevice.DevicePath;
 
+		public static bool IsSupported(RawInputDevice rawDevice)
+		{
+			switch (rawDevice.DeviceType)
+			{
+				case RawInputDeviceType.Mouse:
+				case RawInputDeviceType.Keyboard:
+					return true;
+				default:
+					return false;
+			}
+		}
+
 		public override KeyDevice CreateDevice() =>
 			RawDevice?.DeviceType == RawInputDeviceType.Mouse
 				? new KeyDevice(this, new[]
@@ -102,19 +114,8 @@ namespace MagicInput.Input.RawInput
 							var rid = e.Input;
 							var buttons = rid.Mouse.Buttons;
 
-							if ((buttons & RawMouseButtonFlags.LeftButtonDown) != 0 ||
-								(buttons & RawMouseButtonFlags.RightButtonDown) != 0 ||
-								(buttons & RawMouseButtonFlags.MiddleButtonDown) != 0 ||
-								(buttons & RawMouseButtonFlags.Button4Down) != 0 ||
-								(buttons & RawMouseButtonFlags.Button5Down) != 0)
-								e.Handled = OnKeyDown(rid);
-
-							if ((buttons & RawMouseButtonFlags.LeftButtonUp) != 0 ||
-								(buttons & RawMouseButtonFlags.RightButtonUp) != 0 ||
-								(buttons & RawMouseButtonFlags.MiddleButtonUp) != 0 ||
-								(buttons & RawMouseButtonFlags.Button4Up) != 0 ||
-								(buttons & RawMouseButtonFlags.Button5Up) != 0)
-								OnKeyUp(rid);
+							e.Handled = OnKeyDown(rid);
+							OnKeyUp(rid);
 						}
 					};
 
@@ -138,10 +139,8 @@ namespace MagicInput.Input.RawInput
 						{
 							var rid = e.Input;
 
-							if (rid.Type == RawInputDeviceType.Keyboard && (rid.Keyboard.Flags & RawKeyboardFlags.Up) != 0)
-								OnKeyUp(rid);
-							else
-								e.Handled = OnKeyDown(rid);
+							e.Handled = OnKeyDown(rid);
+							OnKeyUp(rid);
 						}
 					};
 
@@ -158,11 +157,11 @@ namespace MagicInput.Input.RawInput
 											 .SelectMany(i => i.Behaviors)
 											 .Concat(activeBehaviors)
 											 .Distinct()
-											 .Where(i => i.Device.PhysicalDevice is RawKeyPhysicalDevice rkpd
+											 .Where(i => i.Device?.PhysicalDevice is RawKeyPhysicalDevice rkpd
 													  && rkpd.IsConnected
 													  && rkpd.DevicePath == rid.Device?.DevicePath
 													  && i.Key is RawKeyInput rki
-													  && rki.IsMatch(rid)))
+													  && rki.IsMatch(rid, false)))
 					{
 						activeBehaviors.Add(i);
 						handled = i.DoKeyDown() || handled;
@@ -173,11 +172,11 @@ namespace MagicInput.Input.RawInput
 
 				void OnKeyUp(RawInputData rid)
 				{
-					foreach (var i in activeBehaviors.Where(i => i.Device.PhysicalDevice is RawKeyPhysicalDevice rkpd
+					foreach (var i in activeBehaviors.Where(i => i.Device?.PhysicalDevice is RawKeyPhysicalDevice rkpd
 															  && rkpd.IsConnected
 															  && rkpd.DevicePath == rid.Device?.DevicePath
 															  && i.Key is RawKeyInput rki
-															  && rki.IsMatch(rid))
+															  && rki.IsMatch(rid, true))
 													 .ToArray())
 					{
 						i.DoKeyUp();

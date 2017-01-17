@@ -8,7 +8,8 @@ namespace MagicInput.Input.RawInput
 {
 	public class RawKeyInput : KeyInput, IEquatable<RawKeyInput>
 	{
-		public override string DisplayCode => ScanCode.HasValue ? ScanCode.Value.ToString("X2") : ((int)MouseButton.Value).ToString();
+		public override string DisplayCode =>
+			MouseButton?.ToString() ?? ScanCode?.ToString("X2");
 		public override string ShortName =>
 			MouseButton.HasValue
 				? new string(MouseButton.ToString().Where(i => char.IsUpper(i) || char.IsDigit(i)).ToArray()).TrimStart('H')
@@ -26,9 +27,27 @@ namespace MagicInput.Input.RawInput
 		public RawKeyInput(int scanCode) =>
 			ScanCode = scanCode;
 
-		public bool IsMatch(RawInputData rid) =>
-			MouseButton.HasValue && rid.Type == RawInputDeviceType.Mouse && GetMouseButtons(rid).Contains(MouseButton.Value) ||
-			ScanCode.HasValue && rid.Type == RawInputDeviceType.Keyboard && rid.Keyboard.ScanCode == ScanCode;
+		public bool IsMatch(RawInputData rid, bool isUp)
+		{
+			if (MouseButton.HasValue && rid.Type == RawInputDeviceType.Mouse)
+			{
+				var buttons = rid.Mouse.Buttons;
+
+				if (isUp)
+					return MouseButton == RawKeyMouseButton.Left && (buttons & RawMouseButtonFlags.LeftButtonUp) != 0
+						|| MouseButton == RawKeyMouseButton.Right && (buttons & RawMouseButtonFlags.RightButtonUp) != 0
+						|| MouseButton == RawKeyMouseButton.Middle && (buttons & RawMouseButtonFlags.MiddleButtonUp) != 0
+						|| MouseButton == RawKeyMouseButton.X1 && (buttons & RawMouseButtonFlags.Button4Up) != 0
+						|| MouseButton == RawKeyMouseButton.X2 && (buttons & RawMouseButtonFlags.Button5Up) != 0;
+				else
+					return GetMouseButtons(rid).Contains(MouseButton.Value);
+			}
+
+			if (ScanCode.HasValue && rid.Type == RawInputDeviceType.Keyboard && rid.Keyboard.ScanCode == ScanCode)
+				return ((rid.Keyboard.Flags & RawKeyboardFlags.Up) != 0) == isUp;
+
+			return false;
+		}
 
 		public override string ToString()
 		{
@@ -63,18 +82,19 @@ namespace MagicInput.Input.RawInput
 			switch (rid.Type)
 			{
 				case RawInputDeviceType.Mouse:
-					var button = GetMouseButtons(rid).ToArray();
-
-					return button.Any() ? new RawKeyInput
 					{
-						MouseButton = button.First(),
-					} : null;
+						var button = GetMouseButtons(rid).ToArray();
+
+						return button.Any() ? new RawKeyInput
+						{
+							MouseButton = button.First(),
+						} : null;
+					}
 				case RawInputDeviceType.Keyboard:
 					return new RawKeyInput
 					{
 						ScanCode = rid.Keyboard.ScanCode,
 					};
-				case RawInputDeviceType.Hid:
 				default:
 					throw new NotSupportedException();
 			}
