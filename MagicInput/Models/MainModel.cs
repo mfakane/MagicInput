@@ -50,6 +50,7 @@ namespace MagicInput.Models
 		{
 			SwitchInterval = 100;
 			host = new KeyFactoryHost(Directory.GetFiles(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "MagicInput.Input.*.dll")
+											   .Where(i => !i.EndsWith(".Hook.dll"))
 											   .Select(Assembly.LoadFrom));
 		}
 

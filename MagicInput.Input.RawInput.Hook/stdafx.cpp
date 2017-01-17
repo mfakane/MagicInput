@@ -1,4 +1,4 @@
-// stdafx.cpp : 標準インクルード MagicHook.pch のみを
+// stdafx.cpp : 標準インクルード MagicInput.Input.RawInput.Hook.pch のみを
 // 含むソース ファイルは、プリコンパイル済みヘッダーになります。
 // stdafx.obj にはプリコンパイル済み型情報が含まれます。
 

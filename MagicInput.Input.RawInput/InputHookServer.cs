@@ -12,9 +12,9 @@ namespace MagicInput.Input.RawInput
 	{
 		[SuppressUnmanagedCodeSecurity, DllImport("user32", SetLastError = true)]
 		static extern bool ChangeWindowMessageFilterEx(IntPtr hWnd, uint message, int action, IntPtr pChangeFilterStruct);
-		[SuppressUnmanagedCodeSecurity, DllImport("MagicHook")]
+		[SuppressUnmanagedCodeSecurity, DllImport("MagicInput.Input.RawInput.Hook.dll")]
 		static extern bool LoadHook(IntPtr hServerWnd, bool installMouseHook, bool installKeyboardHook);
-		[SuppressUnmanagedCodeSecurity, DllImport("MagicHook")]
+		[SuppressUnmanagedCodeSecurity, DllImport("MagicInput.Input.RawInput.Hook.dll")]
 		static extern bool UnloadHook();
 
 		const int MSGFLT_ALLOW = 1;
