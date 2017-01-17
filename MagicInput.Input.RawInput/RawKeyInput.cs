@@ -9,7 +9,7 @@ namespace MagicInput.Input.RawInput
 	public class RawKeyInput : KeyInput, IEquatable<RawKeyInput>
 	{
 		public override string DisplayCode =>
-			MouseButton?.ToString() ?? ScanCode?.ToString("X2");
+			((int?)MouseButton)?.ToString() ?? ScanCode?.ToString("X2");
 		public override string ShortName =>
 			MouseButton.HasValue
 				? new string(MouseButton.ToString().Where(i => char.IsUpper(i) || char.IsDigit(i)).ToArray()).TrimStart('H')
