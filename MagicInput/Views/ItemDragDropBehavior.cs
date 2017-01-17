@@ -50,6 +50,23 @@ namespace MagicInput.Views
 				AssociatedObject.SelectedIndex == -1)
 				return;
 
+			var obj = (DependencyObject)e.OriginalSource;
+
+			while (obj != null)
+				if ((obj = VisualTreeHelper.GetParent(obj)) is ScrollViewer sv)
+				{
+					var pos = e.GetPosition(sv);
+					var clientSize = new Size(sv.ActualWidth - SystemParameters.VerticalScrollBarWidth, sv.ActualHeight - SystemParameters.HorizontalScrollBarHeight);
+
+					if (sv.ComputedHorizontalScrollBarVisibility == Visibility.Visible && pos.X > clientSize.Width ||
+						sv.ComputedVerticalScrollBarVisibility == Visibility.Visible && pos.Y > clientSize.Height)
+					{
+						mouseDownPosition = null;
+
+						return;
+					}
+				}
+
 			mouseDownPosition = e.GetPosition(AssociatedObject);
 		}
 
