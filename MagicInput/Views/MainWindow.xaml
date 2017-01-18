@@ -83,11 +83,12 @@
 			</tb:TaskbarIcon.ContextMenu>
 		</tb:TaskbarIcon>
 		<TextBlock Margin="0,0,0,8"
-				   Text="デバイス/プロファイル:" />
+				   Text="デバイス セット:" />
 		<Grid Grid.Row="1"
-			  Width="128"
+			  Width="144"
 			  Margin="0,0,8,8">
 			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
 				<RowDefinition Height="Auto" />
 				<RowDefinition />
 			</Grid.RowDefinitions>
@@ -130,7 +131,12 @@
 						Content="{StaticResource PlusPath}"
 						Command="{v:MethodCommand AddDeviceSet}" />
 			</Grid>
-			<ContentControl Grid.Row="1"
+			<TextBlock Grid.Row="1"
+					   Margin="0,0,0,8"
+					   TextTrimming="CharacterEllipsis">
+				<Run Text="{Binding SelectedDeviceSet.DeviceSet.Name, Mode=OneWay}" /><Run Text=" のプロファイル:" />
+			</TextBlock>
+			<ContentControl Grid.Row="2"
 							Content="{Binding SelectedDeviceSet}">
 				<ContentControl.ContentTemplate>
 					<DataTemplate DataType="{x:Type vm:KeyDeviceSetViewModel}">
@@ -170,7 +176,7 @@
 		<Grid Grid.Column="1"
 			  Margin="0,0,0,8">
 			<TextBlock>
-				<Run Text="{Binding SelectedDeviceSet.DeviceSet.Name}" /><Run Text=": " /><Run Text="{Binding SelectedDeviceSet.SelectedProfile.Profile.Name}" />
+				<Run Text="{Binding SelectedDeviceSet.SelectedProfile.Profile.Name, Mode=OneWay}" /><Run Text=" のキーマップ:" />
 			</TextBlock>
 		</Grid>
 		<ContentControl Grid.Row="1"
