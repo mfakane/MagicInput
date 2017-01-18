@@ -84,84 +84,103 @@
 		</tb:TaskbarIcon>
 		<TextBlock Margin="0,0,0,8"
 				   Text="デバイス/プロファイル:" />
-		<TreeView Grid.Row="1"
-				  Width="128"
-				  Margin="0,0,8,8"
-				  ItemsSource="{Binding DeviceSets}"
-				  SelectedItemChanged="TreeView_SelectedItemChanged">
-			<TreeView.ItemContainerStyle>
-				<Style TargetType="TreeViewItem">
-					<Setter Property="IsExpanded"
-							Value="True" />
-					<Setter Property="ContextMenu">
-						<Setter.Value>
-							<ContextMenu>
-								<MenuItem Header="設定(_S)..."
-										  Command="{v:MethodCommand ShowSettings}" />
-								<Separator />
-								<MenuItem Header="削除(_D)"
-										  Command="{v:MethodCommand Main.RemoveDeviceSet}"
-										  CommandParameter="{Binding}"
-										  IsEnabled="{Binding Main.DeviceSets.Count, Converter={StaticResource CompareConverter}, ConverterParameter=&gt;1}" />
-							</ContextMenu>
-						</Setter.Value>
-					</Setter>
-				</Style>
-			</TreeView.ItemContainerStyle>
-			<TreeView.ItemTemplate>
-				<HierarchicalDataTemplate DataType="{x:Type vm:KeyDeviceSetViewModel}"
-										  ItemsSource="{Binding Profiles}">
-					<HierarchicalDataTemplate.ItemContainerStyle>
-						<Style TargetType="TreeViewItem">
-							<Setter Property="IsSelected"
-									Value="{Binding IsSelected}" />
+		<Grid Grid.Row="1"
+			  Width="128"
+			  Margin="0,0,8,8">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition />
+			</Grid.RowDefinitions>
+			<Grid Margin="0,0,0,8">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition />
+					<ColumnDefinition Width="Auto" />
+				</Grid.ColumnDefinitions>
+				<ComboBox ItemsSource="{Binding DeviceSets}"
+						  SelectedItem="{Binding SelectedDeviceSet}"
+						  Margin="0,0,8,0">
+					<ComboBox.ItemContainerStyle>
+						<Style TargetType="ComboBoxItem"
+							   BasedOn="{StaticResource {x:Type ComboBoxItem}}">
 							<Setter Property="ContextMenu">
 								<Setter.Value>
 									<ContextMenu>
 										<MenuItem Header="設定(_S)..."
 												  Command="{v:MethodCommand ShowSettings}" />
+										<Separator />
+										<MenuItem Header="削除(_D)"
+												  Command="{v:MethodCommand Main.RemoveDeviceSet}"
+												  CommandParameter="{Binding}"
+												  IsEnabled="{Binding Main.DeviceSets.Count, Converter={StaticResource CompareConverter}, ConverterParameter=&gt;1}" />
 									</ContextMenu>
 								</Setter.Value>
 							</Setter>
 						</Style>
-					</HierarchicalDataTemplate.ItemContainerStyle>
-					<HierarchicalDataTemplate.ItemTemplate>
-						<DataTemplate DataType="{x:Type vm:KeyProfileViewModel}">
-							<ContentControl Content="{Binding Profile.Name}">
-								<i:Interaction.Triggers>
-									<i:EventTrigger EventName="MouseDoubleClick">
-										<l:LivetCallMethodAction MethodTarget="{Binding}"
-																 MethodName="ShowSettings" />
-									</i:EventTrigger>
-								</i:Interaction.Triggers>
-							</ContentControl>
+					</ComboBox.ItemContainerStyle>
+					<ComboBox.ItemTemplate>
+						<DataTemplate DataType="{x:Type vm:KeyDeviceSetViewModel}">
+							<TextBlock Text="{Binding DeviceSet.Name}" />
 						</DataTemplate>
-					</HierarchicalDataTemplate.ItemTemplate>
-					<ContentControl Content="{Binding DeviceSet.Name}">
-						<i:Interaction.Triggers>
-							<i:EventTrigger EventName="MouseDoubleClick">
-								<l:LivetCallMethodAction MethodTarget="{Binding}"
-														 MethodName="ShowSettings" />
-							</i:EventTrigger>
-						</i:Interaction.Triggers>
-					</ContentControl>
-				</HierarchicalDataTemplate>
-			</TreeView.ItemTemplate>
-		</TreeView>
+					</ComboBox.ItemTemplate>
+				</ComboBox>
+				<Button Grid.Column="1"
+						MinWidth="0"
+						Padding="2"
+						ToolTip="新しいデバイス セット"
+						Content="{StaticResource PlusPath}"
+						Command="{v:MethodCommand AddDeviceSet}" />
+			</Grid>
+			<ContentControl Grid.Row="1"
+							Content="{Binding SelectedDeviceSet}">
+				<ContentControl.ContentTemplate>
+					<DataTemplate DataType="{x:Type vm:KeyDeviceSetViewModel}">
+						<ListBox ItemsSource="{Binding Profiles}"
+								 SelectedItem="{Binding SelectedProfile}"
+								 IsSynchronizedWithCurrentItem="True">
+							<i:Interaction.Behaviors>
+								<v:ItemDragDropBehavior ModelCollection="{Binding DeviceSet.Profiles}" />
+							</i:Interaction.Behaviors>
+							<ListBox.ItemContainerStyle>
+								<Style TargetType="ListBoxItem">
+									<Setter Property="ContextMenu">
+										<Setter.Value>
+											<ContextMenu>
+												<MenuItem Header="設定(_S)..."
+														  Command="{v:MethodCommand ShowSettings}" />
+												<Separator />
+												<MenuItem Header="削除(_D)"
+														  Command="{v:MethodCommand DeviceSet.RemoveProfile}"
+														  CommandParameter="{Binding}"
+														  IsEnabled="{Binding DeviceSet.Profiles.Count, Converter={StaticResource CompareConverter}, ConverterParameter=&gt;1}" />
+											</ContextMenu>
+										</Setter.Value>
+									</Setter>
+								</Style>
+							</ListBox.ItemContainerStyle>
+							<ListBox.ItemTemplate>
+								<DataTemplate DataType="{x:Type vm:KeyProfileViewModel}">
+									<TextBlock Text="{Binding Profile.Name}" />
+								</DataTemplate>
+							</ListBox.ItemTemplate>
+						</ListBox>
+					</DataTemplate>
+				</ContentControl.ContentTemplate>
+			</ContentControl>
+		</Grid>
 		<Grid Grid.Column="1"
 			  Margin="0,0,0,8">
 			<TextBlock>
-				<Run Text="{Binding SelectedProfile.DeviceSet.DeviceSet.Name}" /><Run Text=": " /><Run Text="{Binding SelectedProfile.Profile.Name}" />
+				<Run Text="{Binding SelectedDeviceSet.DeviceSet.Name}" /><Run Text=": " /><Run Text="{Binding SelectedDeviceSet.SelectedProfile.Profile.Name}" />
 			</TextBlock>
 		</Grid>
 		<ContentControl Grid.Row="1"
 						Grid.Column="1"
 						Margin="0,0,0,8"
-						Content="{Binding SelectedProfile}">
+						Content="{Binding SelectedDeviceSet.SelectedProfile}">
 			<ContentControl.ContentTemplate>
 				<DataTemplate DataType="{x:Type vm:KeyProfileViewModel}">
 					<TabControl ItemsSource="{Binding KeyMaps}"
-								SelectedItem="{Binding CurrentKeyMap}"
+								SelectedItem="{Binding CurrentKeyMap, Mode=OneWay}"
 								IsSynchronizedWithCurrentItem="True">
 						<TabControl.ItemContainerStyleSelector>
 							<v:NewItemPlaceholderStyleSelector>
@@ -206,7 +225,7 @@
 											<i:Interaction.Triggers>
 												<l:LivetDataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=TabItem}}"
 																	Value="True">
-													<l:LivetCallMethodAction MethodTarget="{Binding DataContext.SelectedProfile, ElementName=Window}"
+													<l:LivetCallMethodAction MethodTarget="{Binding DataContext.SelectedDeviceSet.SelectedProfile, ElementName=Window}"
 																			 MethodName="AddKeyMap" />
 												</l:LivetDataTrigger>
 											</i:Interaction.Triggers>
@@ -408,9 +427,9 @@
 					Orientation="Horizontal">
 			<Button MinWidth="0"
 					Padding="2"
-					ToolTip="新しいデバイス セット"
+					ToolTip="新しいプロファイル"
 					Content="{StaticResource PlusPath}"
-					Command="{v:MethodCommand AddDeviceSet}" />
+					Command="{v:MethodCommand SelectedDeviceSet.AddProfile}" />
 		</StackPanel>
 		<StackPanel Grid.Row="2"
 					Grid.Column="1"

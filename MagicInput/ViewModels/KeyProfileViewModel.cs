@@ -16,16 +16,6 @@ namespace MagicInput.ViewModels
 			set => Profile.CurrentKeyMap = Profile.KeyMaps[Profile.KeyMaps.IndexOf(value.KeyMap)];
 		}
 
-		public bool IsSelected
-		{
-			get => Profile.DeviceSet.CurrentProfile == Profile;
-			set
-			{
-				if (value)
-					Profile.DeviceSet.CurrentProfile = Profile;
-			}
-		}
-
 		public KeyDeviceSetViewModel DeviceSet { get; }
 		public KeyProfile Profile { get; }
 		public IReadOnlyList<KeyMapViewModel> KeyMaps { get; }
@@ -39,10 +29,6 @@ namespace MagicInput.ViewModels
 			CompositeDisposable.Add(new PropertyChangedEventListener(Profile)
 			{
 				{ nameof(CurrentKeyMap), (sender, e) => DispatcherHelper.UIDispatcher.InvokeAsync(() => RaisePropertyChanged(nameof(CurrentKeyMap))) },
-			});
-			CompositeDisposable.Add(new PropertyChangedEventListener(Profile.DeviceSet)
-			{
-				{ nameof(Profile.DeviceSet.CurrentProfile), (sender, e) => DispatcherHelper.UIDispatcher.InvokeAsync(() => RaisePropertyChanged(nameof(IsSelected))) },
 			});
 			((IEditableCollectionView)CollectionViewSource.GetDefaultView(KeyMaps)).NewItemPlaceholderPosition = NewItemPlaceholderPosition.AtEnd;
 		}

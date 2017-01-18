@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Livet;
 using Livet.Messaging;
 using MagicInput.Input;
@@ -11,9 +12,9 @@ namespace MagicInput.ViewModels
 		public MainModel Model { get; }
 		public IReadOnlyList<KeyDeviceSetViewModel> DeviceSets { get; }
 
-		public KeyProfileViewModel SelectedProfile
+		public KeyDeviceSetViewModel SelectedDeviceSet
 		{
-			get => GetValue<KeyProfileViewModel>();
+			get => GetValue<KeyDeviceSetViewModel>();
 			set => SetValue(value);
 		}
 
@@ -26,6 +27,7 @@ namespace MagicInput.ViewModels
 		{
 			Model = model;
 			DeviceSets = RegisterDisposable(ViewModelHelper.CreateReadOnlyDispatcherCollection(Model.DeviceSets, i => new KeyDeviceSetViewModel(this, i), DispatcherHelper.UIDispatcher));
+			SelectedDeviceSet = DeviceSets.FirstOrDefault();
 		}
 
 		protected override void Dispose(bool disposing)
@@ -53,6 +55,7 @@ namespace MagicInput.ViewModels
 			if (Messenger.GetResponse(new TransitionMessage(vm, nameof(KeyDeviceSetSettingsViewModel))).Response ?? false)
 			{
 				Model.DeviceSets.Add(vm.DeviceSet);
+				SelectedDeviceSet = DeviceSets.Last();
 				Model.ApplyChanges();
 			}
 		}
