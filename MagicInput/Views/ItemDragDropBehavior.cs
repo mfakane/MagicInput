@@ -58,8 +58,8 @@ namespace MagicInput.Views
 					var pos = e.GetPosition(sv);
 					var clientSize = new Size(sv.ActualWidth - SystemParameters.VerticalScrollBarWidth, sv.ActualHeight - SystemParameters.HorizontalScrollBarHeight);
 
-					if (sv.ComputedHorizontalScrollBarVisibility == Visibility.Visible && pos.X > clientSize.Width ||
-						sv.ComputedVerticalScrollBarVisibility == Visibility.Visible && pos.Y > clientSize.Height)
+					if (sv.ComputedVerticalScrollBarVisibility == Visibility.Visible && pos.X > clientSize.Width ||
+						sv.ComputedHorizontalScrollBarVisibility == Visibility.Visible && pos.Y > clientSize.Height)
 					{
 						mouseDownPosition = null;
 
