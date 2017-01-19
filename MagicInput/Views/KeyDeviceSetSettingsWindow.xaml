@@ -146,7 +146,7 @@
 												<DataTemplate DataType="{x:Type in:KeyPhysicalDevice}">
 													<StackPanel>
 														<TextBlock Text="{Binding}" />
-														<TextBlock Text="{Binding DevicePath}"
+														<TextBlock Text="{Binding Description}"
 																   Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
 													</StackPanel>
 												</DataTemplate>
