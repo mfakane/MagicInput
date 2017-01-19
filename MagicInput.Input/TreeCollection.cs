@@ -23,9 +23,9 @@ namespace MagicInput.Input
 
 		public TreeCollection(Func<TParent> parent, Func<T, TParent> getParent, Action<T, TParent> setParent)
 		{
-			this.parent = parent;
-			this.getParent = getParent;
-			this.setParent = setParent;
+			this.parent = parent ?? throw new ArgumentNullException(nameof(parent));
+			this.getParent = getParent ?? throw new ArgumentNullException(nameof(getParent));
+			this.setParent = setParent ?? throw new ArgumentNullException(nameof(setParent));
 		}
 
 		public TreeCollection(Func<TParent> parent, Func<T, TParent> getParent, Action<T, TParent> setParent, IEnumerable<T> collection)
