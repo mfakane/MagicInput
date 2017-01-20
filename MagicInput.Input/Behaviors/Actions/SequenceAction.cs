@@ -9,7 +9,7 @@ namespace MagicInput.Input.Behaviors.Actions
 		public event PropertyChangedEventHandler PropertyChanged;
 
 		[MessagePackIgnore]
-		public SequenceBehavior Behavior { get; set; }
+		public KeyBehavior Behavior { get; set; }
 
 		protected void OnPropertyChanged(PropertyChangedEventArgs e) =>
 			PropertyChanged?.Invoke(this, e);

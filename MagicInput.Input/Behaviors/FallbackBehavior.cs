@@ -15,14 +15,14 @@ namespace MagicInput.Input.Behaviors
 		{
 		}
 
-		protected override bool OnKeyDown() =>
-			GetPreviousKeyMapKey()?.DoKeyDown() ?? false;
+		protected override bool OnKeyDown(KeyData data) =>
+			GetPreviousKeyMapKey()?.DoKeyDown(data) ?? false;
 
-		protected override bool OnKeyRepeat() =>
-			GetPreviousKeyMapKey()?.DoKeyDown() ?? false;
+		protected override bool OnKeyRepeat(KeyData data) =>
+			GetPreviousKeyMapKey()?.DoKeyDown(data) ?? false;
 
-		protected override void OnKeyUp() =>
-			GetPreviousKeyMapKey()?.DoKeyUp();
+		protected override void OnKeyUp(KeyData data) =>
+			GetPreviousKeyMapKey()?.DoKeyUp(data);
 
 		KeyBehavior GetPreviousKeyMapKey()
 		{

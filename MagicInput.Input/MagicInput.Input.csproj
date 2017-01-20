@@ -84,6 +84,7 @@
     <Compile Include="Behaviors\SequenceBehavior.cs" />
     <Compile Include="Behaviors\SwitchKeyMapBehavior.cs" />
     <Compile Include="IKeyProvider.cs" />
+    <Compile Include="KeyData.cs" />
     <Compile Include="KeyDeviceKind.cs" />
     <Compile Include="KeyDeviceSet.cs" />
     <Compile Include="KeyInput.cs" />
@@ -93,6 +94,7 @@
     <Compile Include="KeyDevice.cs" />
     <Compile Include="KeyFactoryHost.cs" />
     <Compile Include="KeyProfile.cs" />
+    <Compile Include="MouseButtons.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TextMatchMethod.cs" />
     <Compile Include="TreeCollection.cs" />

@@ -28,16 +28,16 @@ namespace MagicInput.Input.Behaviors
 
 		public SequenceBehavior()
 		{
-			KeyDownAction = new TreeCollection<SequenceAction, SequenceBehavior>(this, i => i.Behavior, (i, parent) => i.Behavior = parent);
-			KeyHoldAction = new TreeCollection<SequenceAction, SequenceBehavior>(this, i => i.Behavior, (i, parent) => i.Behavior = parent);
-			KeyUpAction = new TreeCollection<SequenceAction, SequenceBehavior>(this, i => i.Behavior, (i, parent) => i.Behavior = parent);
+			KeyDownAction = new TreeCollection<SequenceAction, SequenceBehavior>(this, i => (SequenceBehavior)i.Behavior, (i, parent) => i.Behavior = parent);
+			KeyHoldAction = new TreeCollection<SequenceAction, SequenceBehavior>(this, i => (SequenceBehavior)i.Behavior, (i, parent) => i.Behavior = parent);
+			KeyUpAction = new TreeCollection<SequenceAction, SequenceBehavior>(this, i => (SequenceBehavior)i.Behavior, (i, parent) => i.Behavior = parent);
 		}
 
 		public SequenceBehavior(KeyInput key)
 			: this() =>
 			Key = key;
 
-		protected override bool OnKeyDown()
+		protected override bool OnKeyDown(KeyData data)
 		{
 			lock (onKeyDownLock)
 			{
@@ -61,7 +61,7 @@ namespace MagicInput.Input.Behaviors
 			return true;
 		}
 
-		protected override bool OnKeyRepeat()
+		protected override bool OnKeyRepeat(KeyData data)
 		{
 			if (HoldDuration > 0) return true;
 
@@ -75,7 +75,7 @@ namespace MagicInput.Input.Behaviors
 			return true;
 		}
 
-		protected override void OnKeyUp()
+		protected override void OnKeyUp(KeyData data)
 		{
 			lock (onKeyDownLock)
 				onKeyDown = onKeyDown?.ContinueWith(t =>

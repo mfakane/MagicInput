@@ -52,15 +52,15 @@ namespace MagicInput.Input.RawInput
 			RawDevice?.DeviceType == RawInputDeviceType.Mouse
 				? new KeyDevice(this, new[]
 				{
-					new RawKeyInput(RawKeyMouseButton.Left),
-					new RawKeyInput(RawKeyMouseButton.Right),
-					new RawKeyInput(RawKeyMouseButton.Middle),
-					new RawKeyInput(RawKeyMouseButton.X1),
-					new RawKeyInput(RawKeyMouseButton.X2),
-					new RawKeyInput(RawKeyMouseButton.WheelUp),
-					new RawKeyInput(RawKeyMouseButton.WheelDown),
-					new RawKeyInput(RawKeyMouseButton.HorizontalWheelLeft),
-					new RawKeyInput(RawKeyMouseButton.HorizontalWheelRight),
+					new RawKeyInput(RawKeyMouseButtons.Left),
+					new RawKeyInput(RawKeyMouseButtons.Right),
+					new RawKeyInput(RawKeyMouseButtons.Middle),
+					new RawKeyInput(RawKeyMouseButtons.X1),
+					new RawKeyInput(RawKeyMouseButtons.X2),
+					new RawKeyInput(RawKeyMouseButtons.WheelUp),
+					new RawKeyInput(RawKeyMouseButtons.WheelDown),
+					new RawKeyInput(RawKeyMouseButtons.HorizontalWheelLeft),
+					new RawKeyInput(RawKeyMouseButtons.HorizontalWheelRight),
 				})
 				: base.CreateDevice();
 
@@ -117,7 +117,7 @@ namespace MagicInput.Input.RawInput
 				StopHookServer();
 
 				foreach (var i in activeBehaviors)
-					i.DoKeyUp();
+					i.DoKeyUp(null);
 
 				activeBehaviors.Clear();
 			}
@@ -178,7 +178,7 @@ namespace MagicInput.Input.RawInput
 													  && rki.IsMatch(rid, false)))
 					{
 						activeBehaviors.Add(i);
-						handled = i.DoKeyDown() || handled;
+						handled = i.DoKeyDown(ToData(i.Device.PhysicalDevice, rid)) || handled;
 					}
 
 					return handled;
@@ -193,7 +193,7 @@ namespace MagicInput.Input.RawInput
 															  && rki.IsMatch(rid, true))
 													 .ToArray())
 					{
-						i.DoKeyUp();
+						i.DoKeyUp(ToData(i.Device.PhysicalDevice, rid));
 						activeBehaviors.Remove(i);
 					}
 				}
@@ -216,6 +216,27 @@ namespace MagicInput.Input.RawInput
 							i.PreviewKeyInput(e2);
 							e.Handled = e.Handled || e2.Handled;
 						}
+				}
+			}
+
+			static KeyData ToData(KeyPhysicalDevice physicalDevice, RawInputData rid)
+			{
+				switch (rid.Type)
+				{
+					case RawInputDeviceType.Mouse:
+						return new KeyData
+						(
+							physicalDevice,
+							rid.Mouse.LastX,
+							rid.Mouse.LastY,
+							(rid.Mouse.Flags & RawMouseFlags.MoveAbsolute) != 0,
+							rid.Mouse.Buttons.ToMouseButtons(),
+							rid.Mouse.ButtonData
+						);
+					case RawInputDeviceType.Keyboard:
+						return new KeyData(physicalDevice, (rid.Keyboard.Flags & RawKeyboardFlags.Up) == 0, rid.Keyboard.ScanCode);
+					default:
+						return null;
 				}
 			}
 

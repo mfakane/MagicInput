@@ -17,7 +17,7 @@ namespace MagicInput.Input.Behaviors
 			: this() =>
 			Key = key;
 
-		protected override bool OnKeyDown()
+		protected override bool OnKeyDown(KeyData data)
 		{
 			var keyMap = KeyMap.Profile.KeyMaps.FirstOrDefault(i => i.Guid == TargetKeyMapGuid);
 
@@ -31,9 +31,9 @@ namespace MagicInput.Input.Behaviors
 				return false;
 		}
 
-		protected override bool OnKeyRepeat() => true;
+		protected override bool OnKeyRepeat(KeyData data) => true;
 
-		protected override void OnKeyUp() =>
+		protected override void OnKeyUp(KeyData data) =>
 			KeyMap.Profile.PopKeyMap();
 
 		public override string ToString() =>

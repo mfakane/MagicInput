@@ -46,27 +46,27 @@ namespace MagicInput.Input.Behaviors
 		protected void OnPropertyChanged(PropertyChangedEventArgs e) =>
 			PropertyChanged?.Invoke(this, e);
 
-		public bool DoKeyDown()
+		public bool DoKeyDown(KeyData data)
 		{
 			if (IsDown)
-				return OnKeyRepeat();
+				return OnKeyRepeat(data);
 
 			IsDown = true;
 
-			return OnKeyDown();
+			return OnKeyDown(data);
 		}
 
-		public void DoKeyUp()
+		public void DoKeyUp(KeyData data)
 		{
 			if (!IsDown) return;
 
 			IsDown = false;
-			OnKeyUp();
+			OnKeyUp(data);
 		}
 
-		protected abstract bool OnKeyDown();
-		protected abstract bool OnKeyRepeat();
-		protected abstract void OnKeyUp();
+		protected abstract bool OnKeyDown(KeyData data);
+		protected abstract bool OnKeyRepeat(KeyData data);
+		protected abstract void OnKeyUp(KeyData data);
 
 		public override string ToString() =>
 			GetType().GetCustomAttributes(typeof(DisplayNameAttribute), true).Cast<DisplayNameAttribute>().First().DisplayName;

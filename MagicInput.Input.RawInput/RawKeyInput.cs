@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Linearstar.Core.RawInput;
@@ -14,14 +13,14 @@ namespace MagicInput.Input.RawInput
 			MouseButton.HasValue
 				? new string(MouseButton.ToString().Where(i => char.IsUpper(i) || char.IsDigit(i)).ToArray()).TrimStart('H')
 				: ToString();
-		public RawKeyMouseButton? MouseButton { get; set; }
+		public RawKeyMouseButtons? MouseButton { get; set; }
 		public int? ScanCode { get; set; }
 
 		public RawKeyInput()
 		{
 		}
 
-		public RawKeyInput(RawKeyMouseButton mouseButton) =>
+		public RawKeyInput(RawKeyMouseButtons mouseButton) =>
 			MouseButton = mouseButton;
 
 		public RawKeyInput(int scanCode) =>
@@ -30,18 +29,8 @@ namespace MagicInput.Input.RawInput
 		public bool IsMatch(RawInputData rid, bool isUp)
 		{
 			if (MouseButton.HasValue && rid.Type == RawInputDeviceType.Mouse)
-			{
-				var buttons = rid.Mouse.Buttons;
-
-				if (isUp)
-					return MouseButton == RawKeyMouseButton.Left && (buttons & RawMouseButtonFlags.LeftButtonUp) != 0
-						|| MouseButton == RawKeyMouseButton.Right && (buttons & RawMouseButtonFlags.RightButtonUp) != 0
-						|| MouseButton == RawKeyMouseButton.Middle && (buttons & RawMouseButtonFlags.MiddleButtonUp) != 0
-						|| MouseButton == RawKeyMouseButton.X1 && (buttons & RawMouseButtonFlags.Button4Up) != 0
-						|| MouseButton == RawKeyMouseButton.X2 && (buttons & RawMouseButtonFlags.Button5Up) != 0;
-				else
-					return GetMouseButtons(rid).Contains(MouseButton.Value);
-			}
+				return !isUp && (rid.Mouse.Buttons.GetDownRawKeyMouseButton(rid.Mouse.ButtonData) & MouseButton) != 0
+					|| isUp && (rid.Mouse.Buttons.ToRawKeyMouseButton(rid.Mouse.ButtonData) & MouseButton) != 0 && (rid.Mouse.Buttons.GetDownRawKeyMouseButton(rid.Mouse.ButtonData) & MouseButton) == 0;
 
 			if (ScanCode.HasValue && rid.Type == RawInputDeviceType.Keyboard && rid.Keyboard.ScanCode == ScanCode)
 				return ((rid.Keyboard.Flags & RawKeyboardFlags.Up) != 0) == isUp;
@@ -83,11 +72,11 @@ namespace MagicInput.Input.RawInput
 			{
 				case RawInputDeviceType.Mouse:
 					{
-						var button = GetMouseButtons(rid).ToArray();
+						var button = rid.Mouse.Buttons.GetDownRawKeyMouseButton(rid.Mouse.ButtonData, true);
 
-						return button.Any() ? new RawKeyInput
+						return button != RawKeyMouseButtons.None ? new RawKeyInput
 						{
-							MouseButton = button.First(),
+							MouseButton = button,
 						} : null;
 					}
 				case RawInputDeviceType.Keyboard:
@@ -99,48 +88,20 @@ namespace MagicInput.Input.RawInput
 					throw new NotSupportedException();
 			}
 		}
-
-		public static IEnumerable<RawKeyMouseButton> GetMouseButtons(RawInputData rid)
-		{
-			if ((rid.Mouse.Buttons & RawMouseButtonFlags.LeftButtonDown) != 0 ||
-				(rid.Mouse.Buttons & RawMouseButtonFlags.LeftButtonUp) != 0)
-				yield return RawKeyMouseButton.Left;
-
-			if ((rid.Mouse.Buttons & RawMouseButtonFlags.RightButtonUp) != 0 ||
-				(rid.Mouse.Buttons & RawMouseButtonFlags.RightButtonUp) != 0)
-				yield return RawKeyMouseButton.Right;
-
-			if ((rid.Mouse.Buttons & RawMouseButtonFlags.MiddleButtonDown) != 0 ||
-				(rid.Mouse.Buttons & RawMouseButtonFlags.MiddleButtonUp) != 0)
-				yield return RawKeyMouseButton.Middle;
-
-			if ((rid.Mouse.Buttons & RawMouseButtonFlags.Button4Down) != 0 ||
-				(rid.Mouse.Buttons & RawMouseButtonFlags.Button4Up) != 0)
-				yield return RawKeyMouseButton.X1;
-
-			if ((rid.Mouse.Buttons & RawMouseButtonFlags.Button5Down) != 0 ||
-				(rid.Mouse.Buttons & RawMouseButtonFlags.Button5Up) != 0)
-				yield return RawKeyMouseButton.X2;
-
-			if ((rid.Mouse.Buttons & RawMouseButtonFlags.MouseWheel) != 0)
-				yield return rid.Mouse.ButtonData > 0 ? RawKeyMouseButton.WheelUp : RawKeyMouseButton.WheelDown;
-
-			if ((rid.Mouse.Buttons & RawMouseButtonFlags.MouseHorizontalWheel) != 0)
-				yield return rid.Mouse.ButtonData > 0 ? RawKeyMouseButton.HorizontalWheelLeft : RawKeyMouseButton.HorizontalWheelRight;
-		}
 	}
 
-	public enum RawKeyMouseButton
+	[Flags]
+	public enum RawKeyMouseButtons
 	{
 		None,
 		Left,
 		Right,
-		Middle,
-		X1,
-		X2,
-		WheelUp,
-		WheelDown,
-		HorizontalWheelLeft,
-		HorizontalWheelRight,
+		Middle = 4,
+		X1 = 8,
+		X2 = 16,
+		WheelUp = 32,
+		WheelDown = 64,
+		HorizontalWheelLeft = 128,
+		HorizontalWheelRight = 256,
 	}
 }
