@@ -37,15 +37,16 @@ namespace MagicInput.ViewModels
 
 		public void Apply()
 		{
+			Devices.ForEach(i => i.Dispose());
+			Main.Stop();
 			DeviceSet.Devices.Clear();
+			DeviceSet.Profiles.Clear();
 
 			foreach (var i in Devices.Where(i => i.PhysicalDevice != null && i.IsChecked))
 			{
 				i.Apply();
 				DeviceSet.Devices.Add(i.Device);
 			}
-
-			DeviceSet.Profiles.Clear();
 
 			foreach (var i in Profiles)
 			{
@@ -65,7 +66,7 @@ namespace MagicInput.ViewModels
 					i.Behaviors.Add(j);
 			}
 
-			Main.Model.ApplyChanges();
+			Main.ApplyChanges();
 		}
 
 		public void AddDevice()
@@ -130,7 +131,6 @@ namespace MagicInput.ViewModels
 			{
 				if (previewHandle != null)
 				{
-					CompositeDisposable.Remove(previewHandle);
 					previewHandle.Dispose();
 					previewHandle = null;
 				}
@@ -139,7 +139,7 @@ namespace MagicInput.ViewModels
 				RaisePropertyChanged(nameof(Name));
 
 				if (isLoaded && value != null)
-					CompositeDisposable.Add(previewHandle = CreatePreview());
+					previewHandle = CreatePreview();
 			}
 		}
 
@@ -183,7 +183,7 @@ namespace MagicInput.ViewModels
 				return;
 
 			if (PhysicalDevice != null)
-				CompositeDisposable.Add(previewHandle = CreatePreview());
+				previewHandle = CreatePreview();
 
 			isLoaded = true;
 		}
@@ -191,6 +191,7 @@ namespace MagicInput.ViewModels
 		protected override void Dispose(bool disposing)
 		{
 			isLoaded = false;
+			previewHandle?.Dispose();
 			previewHandle = null;
 			base.Dispose(disposing);
 		}

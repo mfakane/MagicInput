@@ -10,6 +10,7 @@ namespace MagicInput.ViewModels
 	public class KeyBehaviorViewModel : ViewModelBase
 	{
 		readonly Dictionary<Type, KeyBehavior> behaviorInstances = new Dictionary<Type, KeyBehavior>();
+		IDisposable handle;
 
 		public KeyMapViewModel KeyMap { get; }
 
@@ -62,11 +63,29 @@ namespace MagicInput.ViewModels
 			if (DesignerProperties.GetIsInDesignMode(obj))
 				return;
 
-			CompositeDisposable.Add(Behavior.Device.PhysicalDevice.RegisterPreview(e => DispatcherHelper.UIDispatcher.InvokeAsync(() =>
+			StartPreview();
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			StopPreview();
+			base.Dispose(disposing);
+		}
+
+		public void StartPreview()
+		{
+			handle?.Dispose();
+			handle = Behavior.Device.PhysicalDevice.RegisterPreview(e => DispatcherHelper.UIDispatcher.InvokeAsync(() =>
 			{
 				if ((Behavior.Device?.PhysicalDevice.Equals(e.PhysicalDevice) ?? false) && e.Key == Behavior.Key)
 					KeyMap.SelectedBehavior = this;
-			})));
+			}));
+		}
+
+		public void StopPreview()
+		{
+			handle?.Dispose();
+			handle = null;
 		}
 	}
 }

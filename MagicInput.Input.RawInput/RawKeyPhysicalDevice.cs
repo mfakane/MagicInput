@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Windows.Forms;
 using Linearstar.Core.RawInput;
 using MagicInput.Input.Behaviors;
 
@@ -86,7 +84,8 @@ namespace MagicInput.Input.RawInput
 			static readonly object inputHookLock = new object();
 			static readonly HashSet<RawKeyDeviceHandle> devices = new HashSet<RawKeyDeviceHandle>();
 			static readonly HashSet<KeyBehavior> activeBehaviors = new HashSet<KeyBehavior>();
-			static Thread inputHookThread;
+			static LowLevelMouseHandler mouseServer;
+			static InputHookServer hookServer;
 
 			RawKeyPhysicalDevice PhysicalDevice { get; }
 			Action<KeyInputEventArgs> PreviewKeyInput { get; }
@@ -101,57 +100,72 @@ namespace MagicInput.Input.RawInput
 			public void Dispose() =>
 				Unregister(this);
 
-			static void InputHookProcess()
+			static void Register(RawKeyDeviceHandle device)
 			{
-				using (var mouseServer = new LowLevelMouseHandler())
-				using (var hookServer = new InputHookServer())
+				if (!devices.Any())
+					StartHookServer();
+
+				devices.Add(device);
+			}
+
+			static void Unregister(RawKeyDeviceHandle device)
+			{
+				devices.Remove(device);
+
+				if (devices.Any()) return;
+
+				StopHookServer();
+
+				foreach (var i in activeBehaviors)
+					i.DoKeyUp();
+
+				activeBehaviors.Clear();
+			}
+
+			static void StartHookServer()
+			{
+				if (hookServer != null)
+					return;
+
+				mouseServer = new LowLevelMouseHandler();
+				hookServer = new InputHookServer();
+				mouseServer.PreviewInput += PreviewInputHandler;
+				mouseServer.Input += (sender, e) =>
 				{
-					mouseServer.PreviewInput += PreviewInputHandler;
-					mouseServer.Input += (sender, e) =>
-					{
-						lock (inputHookLock)
-						{
-							var rid = e.Input;
-							var buttons = rid.Mouse.Buttons;
+					var rid = e.Input;
+					var buttons = rid.Mouse.Buttons;
 
-							e.Handled = OnKeyDown(rid);
-							OnKeyUp(rid);
-						}
-					};
+					e.Handled = OnKeyDown(rid);
+					OnKeyUp(rid);
+				};
 
-					hookServer.DeviceConnected += (sender, e) =>
-					{
-						foreach (var i in devices)
-							if (i.PhysicalDevice.DevicePath == e.Device.DevicePath)
-								i.PhysicalDevice.RawDevice = e.Device;
-					};
-					hookServer.DeviceDisconnected += (sender, e) =>
-					{
-						foreach (var i in devices)
-							if (i.PhysicalDevice.Handle is IntPtr handle &&
-								handle == e.Handle)
-								i.PhysicalDevice.RawDevice = null;
-					};
-					hookServer.PreviewInput += PreviewInputHandler;
-					hookServer.Input += (sender, e) =>
-					{
-						lock (inputHookLock)
-						{
-							var rid = e.Input;
+				hookServer.DeviceConnected += (sender, e) =>
+				{
+					foreach (var i in devices)
+						if (i.PhysicalDevice.DevicePath == e.Device.DevicePath)
+							i.PhysicalDevice.RawDevice = e.Device;
+				};
+				hookServer.DeviceDisconnected += (sender, e) =>
+				{
+					foreach (var i in devices)
+						if (i.PhysicalDevice.Handle is IntPtr handle &&
+							handle == e.Handle)
+							i.PhysicalDevice.RawDevice = null;
+				};
+				hookServer.PreviewInput += PreviewInputHandler;
+				hookServer.Input += (sender, e) =>
+				{
+					var rid = e.Input;
 
-							e.Handled = OnKeyDown(rid);
-							OnKeyUp(rid);
-						}
-					};
-
-					Application.Run();
-				}
+					e.Handled = OnKeyDown(rid);
+					OnKeyUp(rid);
+				};
 
 				bool OnKeyDown(RawInputData rid)
 				{
 					var handled = false;
 
-					foreach (var i in devices.Where(i => i.PhysicalDevice.Device?.DeviceSet != null)
+					foreach (var i in devices.Where(i => i.PhysicalDevice.Device.DeviceSet != null)
 											 .Select(i => i.PhysicalDevice.Device.DeviceSet)
 											 .Select(i => i.CurrentProfile.CurrentKeyMap)
 											 .SelectMany(i => i.Behaviors)
@@ -172,7 +186,7 @@ namespace MagicInput.Input.RawInput
 
 				void OnKeyUp(RawInputData rid)
 				{
-					foreach (var i in activeBehaviors.Where(i => i.Device?.PhysicalDevice is RawKeyPhysicalDevice rkpd
+					foreach (var i in activeBehaviors.Where(i => i.Device.PhysicalDevice is RawKeyPhysicalDevice rkpd
 															  && rkpd.IsConnected
 															  && rkpd.DevicePath == rid.Device?.DevicePath
 															  && i.Key is RawKeyInput rki
@@ -188,54 +202,29 @@ namespace MagicInput.Input.RawInput
 				{
 					var rid = e.Input;
 
-					lock (inputHookLock)
-						foreach (var i in devices)
-							if (i.PreviewKeyInput != null &&
-								i.PhysicalDevice.DevicePath == rid.Device?.DevicePath)
-							{
-								var key = RawKeyInput.FromRawInputData(rid);
+					foreach (var i in devices)
+						if (i.PreviewKeyInput != null &&
+							i.PhysicalDevice.DevicePath == rid.Device?.DevicePath)
+						{
+							var key = RawKeyInput.FromRawInputData(rid);
 
-								if (key == null)
-									continue;
+							if (key == null)
+								continue;
 
-								var e2 = new KeyInputEventArgs(i.PhysicalDevice, key);
+							var e2 = new KeyInputEventArgs(i.PhysicalDevice, key);
 
-								i.PreviewKeyInput(e2);
-								e.Handled = e.Handled || e2.Handled;
-							}
+							i.PreviewKeyInput(e2);
+							e.Handled = e.Handled || e2.Handled;
+						}
 				}
 			}
 
-			static void Register(RawKeyDeviceHandle device)
+			static void StopHookServer()
 			{
-				lock (inputHookLock)
-				{
-					if (!devices.Any() && inputHookThread == null)
-					{
-						inputHookThread = new Thread(InputHookProcess) { IsBackground = true };
-						inputHookThread.Start();
-					}
-
-					devices.Add(device);
-				}
-			}
-
-			static void Unregister(RawKeyDeviceHandle device)
-			{
-				lock (inputHookLock)
-				{
-					devices.Remove(device);
-
-					if (devices.Any()) return;
-
-					inputHookThread?.Abort();
-					inputHookThread = null;
-
-					foreach (var i in activeBehaviors)
-						i.DoKeyUp();
-
-					activeBehaviors.Clear();
-				}
+				hookServer?.Dispose();
+				mouseServer?.Dispose();
+				hookServer = null;
+				mouseServer = null;
 			}
 		}
 	}

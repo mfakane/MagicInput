@@ -31,14 +31,15 @@ namespace MagicInput.Input
 			get => _physicalDevice;
 			set
 			{
-				if (PhysicalDevice != null)
-					PhysicalDevice.Device = null;
+				if (_physicalDevice != null)
+					_physicalDevice.Device = null;
 
-				if (_physicalDevice != (_physicalDevice = value))
+				if (value != null)
+					value.Device = this;
+
+				if (_physicalDevice != value)
 				{
-					if (value != null)
-						value.Device = this;
-
+					_physicalDevice = value;
 					OnPropertyChanged(new PropertyChangedEventArgs(nameof(PhysicalDevice)));
 				}
 			}

@@ -36,6 +36,22 @@ namespace MagicInput.ViewModels
 			base.Dispose(disposing);
 		}
 
+		public void ApplyChanges()
+		{
+			Model.ApplyChanges();
+
+			foreach (var i in DeviceSets.SelectMany(i => i.Profiles).SelectMany(i => i.KeyMaps).SelectMany(i => i.Behaviors))
+				i.StartPreview();
+		}
+
+		public void Stop()
+		{
+			Model.Stop();
+
+			foreach (var i in DeviceSets.SelectMany(i => i.Profiles).SelectMany(i => i.KeyMaps).SelectMany(i => i.Behaviors))
+				i.StopPreview();
+		}
+
 		public void AddDeviceSet()
 		{
 			var vm = new KeyDeviceSetSettingsViewModel(this, new KeyDeviceSet("デバイス セット")

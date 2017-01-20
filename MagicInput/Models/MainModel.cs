@@ -80,6 +80,12 @@ namespace MagicInput.Models
 			}
 		}
 
+		public void Stop()
+		{
+			deviceHandle?.Dispose();
+			deviceHandle = null;
+		}
+
 		public void ApplyChanges()
 		{
 			deviceHandle?.Dispose();
