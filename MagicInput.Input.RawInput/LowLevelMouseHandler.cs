@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Threading;
@@ -28,6 +27,7 @@ namespace MagicInput.Input.RawInput
 		static extern bool SetCursorPos(int x, int y);
 
 		const int WM_INPUT_DEVICE_CHANGE = 0xFE;
+		const int WM_INPUT = 0xFF;
 		const int WH_MOUSE_LL = 14;
 
 		[StructLayout(LayoutKind.Sequential)]
@@ -75,7 +75,7 @@ namespace MagicInput.Input.RawInput
 		readonly IntPtr hHook;
 		readonly HookProc hookDelegate;
 		readonly Thread readThread;
-		readonly BlockingCollection<TaskCompletionSource<RawInputData[]>> bufferedReadRequest = new BlockingCollection<TaskCompletionSource<RawInputData[]>>();
+		readonly BlockingCollection<(DateTime timeout, TaskCompletionSource<RawInputData> result, Func<RawInputData, bool> matches)> readRequest = new BlockingCollection<(DateTime timeout, TaskCompletionSource<RawInputData> result, Func<RawInputData, bool> matches)>();
 		static Int32Point? prevPos;
 
 		public event EventHandler<RawInputEventArgs> PreviewInput;
@@ -102,32 +102,24 @@ namespace MagicInput.Input.RawInput
 
 			if (data.Flags == EventInjectedFlags.None)
 			{
-				var buf = PerformBufferedRead(5)?.ToList();
+				var rid = ReadInput(5, i =>
+					i.Type == RawInputDeviceType.Mouse &&
+					i.DeviceHandle != IntPtr.Zero &&
+					FlagMatches(i.Mouse, msg, data));
 
-				if (buf != null)
+				if (rid != null)
 				{
-					buf.RemoveAll(i =>
-					{
-						var e = new RawInputEventArgs(i);
+					var e = new RawInputEventArgs(rid);
 
-						OnPreviewInput(e);
+					OnPreviewInput(e);
 
-						return e.Handled;
-					});
-
-					var matchingInputs = buf.Where(i => i.Type == RawInputDeviceType.Mouse
-													 && i.DeviceHandle != IntPtr.Zero
-													 && FlagMatches(i.Mouse, msg, data));
-
-					if (matchingInputs.Any(OnInput))
+					if (!e.Handled && OnInput(rid))
 					{
 						if (msg == MouseMessage.MouseMove && prevPos is Int32Point pt)
 							SetCursorPos(pt.X, pt.Y);
 
 						return 1;
 					}
-
-					RawInputData.DefRawInputProc(buf.ToArray());
 				}
 			}
 
@@ -156,15 +148,13 @@ namespace MagicInput.Input.RawInput
 
 		void ReadThread()
 		{
-			using (var f = new ReceiverWindow())
+			using (var f = new ReceiverWindow(readRequest))
 			{
 				RawInputDevice.RegisterDevice(HidUsageAndPage.Mouse, RawInputDeviceFlags.InputSink, f.Handle);
 
 				try
 				{
-					while (true)
-						if (bufferedReadRequest.TryTake(out var item, Timeout.Infinite))
-							item.SetResult(RawInputData.GetBufferedData());
+					Application.Run();
 				}
 				finally
 				{
@@ -173,11 +163,11 @@ namespace MagicInput.Input.RawInput
 			}
 		}
 
-		RawInputData[] PerformBufferedRead(int millisecondsTimeout)
+		RawInputData ReadInput(int millisecondsTimeout, Func<RawInputData, bool> matches)
 		{
-			var tcs = new TaskCompletionSource<RawInputData[]>();
+			var tcs = new TaskCompletionSource<RawInputData>();
 
-			bufferedReadRequest.Add(tcs);
+			readRequest.Add((DateTime.Now.AddMilliseconds(millisecondsTimeout * 10), tcs, matches));
 
 			return tcs.Task.Wait(millisecondsTimeout) ? tcs.Task.Result : null;
 		}
@@ -187,7 +177,8 @@ namespace MagicInput.Input.RawInput
 			switch (msg)
 			{
 				case MouseMessage.MouseMove:
-					return raw.Buttons == RawMouseButtonFlags.None;
+					return raw.LastX != 0
+						|| raw.LastY != 0;
 				case MouseMessage.LeftButtonDown:
 					return (raw.Buttons & RawMouseButtonFlags.LeftButtonDown) != 0;
 				case MouseMessage.LeftButtonUp:
@@ -227,8 +218,11 @@ namespace MagicInput.Input.RawInput
 
 		sealed class ReceiverWindow : NativeWindow, IDisposable
 		{
-			public ReceiverWindow()
+			readonly BlockingCollection<(DateTime timeout, TaskCompletionSource<RawInputData> result, Func<RawInputData, bool> matches)> buffer;
+
+			public ReceiverWindow(BlockingCollection<(DateTime timeout, TaskCompletionSource<RawInputData> result, Func<RawInputData, bool> matches)> buffer)
 			{
+				this.buffer = buffer;
 				CreateHandle(new CreateParams
 				{
 					X = 0,
@@ -237,6 +231,31 @@ namespace MagicInput.Input.RawInput
 					Height = 0,
 					Style = 0x800000
 				});
+			}
+
+			protected override void WndProc(ref Message m)
+			{
+				switch (m.Msg)
+				{
+					case WM_INPUT:
+						{
+							var rid = RawInputData.FromHandle(m.LParam);
+							var items = new List<(DateTime timeout, TaskCompletionSource<RawInputData> result, Func<RawInputData, bool> matches)>();
+
+							while (buffer.TryTake(out var item))
+								if (item.matches(rid))
+									item.result.SetResult(rid);
+								else if (item.timeout > DateTime.Now)
+									items.Add(item);
+
+							foreach (var i in items)
+								buffer.Add(i);
+
+							break;
+						}
+				}
+
+				base.WndProc(ref m);
 			}
 
 			~ReceiverWindow() =>
