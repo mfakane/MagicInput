@@ -108,6 +108,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ViewModels\Behaviors\MoveWithSequenceBehaviorViewModel.cs" />
     <Compile Include="ViewModels\Behaviors\SwitchKeyMapBehaviorViewModel.cs" />
     <Compile Include="ViewModels\Behaviors\SequenceBehaviorViewModel.cs" />
     <Compile Include="Views\Behaviors\Actions\OpenFileView.xaml.cs">
@@ -115,6 +116,9 @@
     </Compile>
     <Compile Include="Views\Behaviors\Actions\WaitView.xaml.cs">
       <DependentUpon>WaitView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Behaviors\MoveWithSequenceBehaviorView.xaml.cs">
+      <DependentUpon>MoveWithSequenceBehaviorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Behaviors\SequenceBehaviorView.xaml.cs">
       <DependentUpon>SequenceBehaviorView.xaml</DependentUpon>
@@ -162,6 +166,10 @@
     <Page Include="Views\Behaviors\Actions\SequenceActionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Behaviors\MoveWithSequenceBehaviorView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Behaviors\SequenceBehaviorView.xaml">
       <Generator>MSBuild:Compile</Generator>

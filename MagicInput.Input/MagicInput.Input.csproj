@@ -61,6 +61,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
@@ -81,6 +82,7 @@
     <Compile Include="Behaviors\Actions\WaitAction.cs" />
     <Compile Include="Behaviors\FallbackBehavior.cs" />
     <Compile Include="Behaviors\KeyBehavior.cs" />
+    <Compile Include="Behaviors\MoveWithSequenceBehavior.cs" />
     <Compile Include="Behaviors\SequenceBehavior.cs" />
     <Compile Include="Behaviors\SwitchKeyMapBehavior.cs" />
     <Compile Include="IKeyProvider.cs" />

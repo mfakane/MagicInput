@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Linearstar.Core.RawInput;
 using MagicInput.Input.Behaviors;
 
@@ -52,6 +53,7 @@ namespace MagicInput.Input.RawInput
 			RawDevice?.DeviceType == RawInputDeviceType.Mouse
 				? new KeyDevice(this, new[]
 				{
+					new RawKeyInput(RawKeyMouseButtons.Move),
 					new RawKeyInput(RawKeyMouseButtons.Left),
 					new RawKeyInput(RawKeyMouseButtons.Right),
 					new RawKeyInput(RawKeyMouseButtons.Middle),
@@ -116,8 +118,9 @@ namespace MagicInput.Input.RawInput
 
 				StopHookServer();
 
-				foreach (var i in activeBehaviors)
-					i.DoKeyUp(null);
+				lock (inputHookLock)
+					foreach (var i in activeBehaviors)
+						i.DoKeyUp(null);
 
 				activeBehaviors.Clear();
 			}
@@ -133,7 +136,6 @@ namespace MagicInput.Input.RawInput
 				mouseServer.Input += (sender, e) =>
 				{
 					var rid = e.Input;
-					var buttons = rid.Mouse.Buttons;
 
 					e.Handled = OnKeyDown(rid);
 					OnKeyUp(rid);
@@ -165,7 +167,8 @@ namespace MagicInput.Input.RawInput
 				{
 					var handled = false;
 
-					foreach (var i in devices.Where(i => i.PhysicalDevice.Device.DeviceSet != null)
+					lock (inputHookLock)
+						foreach (var i in devices.Where(i => i.PhysicalDevice.Device.DeviceSet != null)
 											 .Select(i => i.PhysicalDevice.Device.DeviceSet)
 											 .Select(i => i.CurrentProfile.CurrentKeyMap)
 											 .SelectMany(i => i.Behaviors)
@@ -176,26 +179,46 @@ namespace MagicInput.Input.RawInput
 													  && rkpd.DevicePath == rid.Device?.DevicePath
 													  && i.Key is RawKeyInput rki
 													  && rki.IsMatch(rid, false)))
-					{
-						activeBehaviors.Add(i);
-						handled = i.DoKeyDown(ToData(i.Device.PhysicalDevice, rid)) || handled;
-					}
+						{
+							var rki = (RawKeyInput)i.Key;
+
+							activeBehaviors.Add(i);
+							handled = i.DoKeyDown(ToData(i.Device.PhysicalDevice, rid)) || handled;
+							rki.LastInput = DateTime.Now;
+
+							if ((rki.MouseButton & (RawKeyMouseButtons.Move | RawKeyMouseButtons.WheelUp | RawKeyMouseButtons.WheelDown | RawKeyMouseButtons.HorizontalWheelLeft | RawKeyMouseButtons.HorizontalWheelRight)) != 0)
+								Task.Run(async () =>
+								{
+									const int timeout = 50;
+									var time = DateTime.Now;
+
+									await Task.Delay(timeout).ConfigureAwait(false);
+
+									if (rki.LastInput <= time)
+										lock (inputHookLock)
+										{
+											i.DoKeyUp(ToData(i.Device.PhysicalDevice, rid));
+											activeBehaviors.Remove(i);
+										}
+								});
+						}
 
 					return handled;
 				}
 
 				void OnKeyUp(RawInputData rid)
 				{
-					foreach (var i in activeBehaviors.Where(i => i.Device.PhysicalDevice is RawKeyPhysicalDevice rkpd
-															  && rkpd.IsConnected
-															  && rkpd.DevicePath == rid.Device?.DevicePath
-															  && i.Key is RawKeyInput rki
-															  && rki.IsMatch(rid, true))
-													 .ToArray())
-					{
-						i.DoKeyUp(ToData(i.Device.PhysicalDevice, rid));
-						activeBehaviors.Remove(i);
-					}
+					lock (inputHookLock)
+						foreach (var i in activeBehaviors.Where(i => i.Device.PhysicalDevice is RawKeyPhysicalDevice rkpd
+																  && rkpd.IsConnected
+																  && rkpd.DevicePath == rid.Device?.DevicePath
+																  && i.Key is RawKeyInput rki
+																  && rki.IsMatch(rid, true))
+														 .ToArray())
+						{
+							i.DoKeyUp(ToData(i.Device.PhysicalDevice, rid));
+							activeBehaviors.Remove(i);
+						}
 				}
 
 				void PreviewInputHandler(object sender, RawInputEventArgs e)

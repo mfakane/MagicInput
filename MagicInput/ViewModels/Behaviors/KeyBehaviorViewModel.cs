@@ -33,6 +33,8 @@ namespace MagicInput.ViewModels
 			{
 				case SequenceBehavior sequenceBehavior:
 					return new SequenceBehaviorViewModel(keyMap, sequenceBehavior);
+				case MoveWithSequenceBehavior moveWithSequenceBehavior:
+					return new MoveWithSequenceBehaviorViewModel(keyMap, moveWithSequenceBehavior);
 				case SwitchKeyMapBehavior switchKeyMapBehavior:
 					return new SwitchKeyMapBehaviorViewModel(keyMap, switchKeyMapBehavior);
 				default:

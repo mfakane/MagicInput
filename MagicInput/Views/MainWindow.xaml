@@ -427,6 +427,9 @@
 														<DataTemplate DataType="{x:Type vm:SequenceBehaviorViewModel}">
 															<v:SequenceBehaviorView />
 														</DataTemplate>
+														<DataTemplate DataType="{x:Type vm:MoveWithSequenceBehaviorViewModel}">
+															<v:MoveWithSequenceBehaviorView />
+														</DataTemplate>
 														<DataTemplate DataType="{x:Type vm:SwitchKeyMapBehaviorViewModel}">
 															<v:SwitchKeyMapBehaviorView />
 														</DataTemplate>

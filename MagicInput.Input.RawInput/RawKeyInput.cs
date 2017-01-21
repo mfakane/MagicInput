@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Linearstar.Core.RawInput;
+using MagicInput.Input.Behaviors;
+using MsgPack.Serialization;
 
 namespace MagicInput.Input.RawInput
 {
@@ -11,10 +14,12 @@ namespace MagicInput.Input.RawInput
 			((int?)MouseButton)?.ToString() ?? ScanCode?.ToString("X2");
 		public override string ShortName =>
 			MouseButton.HasValue
-				? new string(MouseButton.ToString().Where(i => char.IsUpper(i) || char.IsDigit(i)).ToArray()).TrimStart('H')
+				? MouseButton == RawKeyMouseButtons.Move ? "P" : new string(MouseButton.ToString().Where(i => char.IsUpper(i) || char.IsDigit(i)).ToArray()).TrimStart('H')
 				: ToString();
 		public RawKeyMouseButtons? MouseButton { get; set; }
 		public int? ScanCode { get; set; }
+
+		internal DateTime LastInput { get; set; }
 
 		public RawKeyInput()
 		{
@@ -26,11 +31,22 @@ namespace MagicInput.Input.RawInput
 		public RawKeyInput(int scanCode) =>
 			ScanCode = scanCode;
 
+		[MessagePackIgnore]
+		public override IList<Type> SupportedTypes =>
+			MouseButton == RawKeyMouseButtons.Move ? new[]
+			{
+				typeof(FallbackBehavior),
+				typeof(MoveWithSequenceBehavior),
+			} : base.SupportedTypes;
+
 		public bool IsMatch(RawInputData rid, bool isUp)
 		{
 			if (MouseButton.HasValue && rid.Type == RawInputDeviceType.Mouse)
-				return !isUp && (rid.Mouse.Buttons.GetDownRawKeyMouseButton(rid.Mouse.ButtonData) & MouseButton) != 0
-					|| isUp && (rid.Mouse.Buttons.ToRawKeyMouseButton(rid.Mouse.ButtonData) & MouseButton) != 0 && (rid.Mouse.Buttons.GetDownRawKeyMouseButton(rid.Mouse.ButtonData) & MouseButton) == 0;
+				if (isUp)
+					return (rid.Mouse.Buttons.ToRawKeyMouseButton(rid.Mouse.ButtonData) & MouseButton) != 0 && (rid.Mouse.Buttons.GetDownRawKeyMouseButton(rid.Mouse.ButtonData) & MouseButton) == 0;
+				else
+					return (rid.Mouse.Buttons.GetDownRawKeyMouseButton(rid.Mouse.ButtonData) & MouseButton) != 0
+						|| (rid.Mouse.LastX != 0 || rid.Mouse.LastY != 0) && (MouseButton & RawKeyMouseButtons.Move) != 0;
 
 			if (ScanCode.HasValue && rid.Type == RawInputDeviceType.Keyboard && rid.Keyboard.ScanCode == ScanCode)
 				return ((rid.Keyboard.Flags & RawKeyboardFlags.Up) != 0) == isUp;
@@ -94,14 +110,15 @@ namespace MagicInput.Input.RawInput
 	public enum RawKeyMouseButtons
 	{
 		None,
+		Move,
 		Left,
-		Right,
-		Middle = 4,
-		X1 = 8,
-		X2 = 16,
-		WheelUp = 32,
-		WheelDown = 64,
-		HorizontalWheelLeft = 128,
-		HorizontalWheelRight = 256,
+		Right = 4,
+		Middle = 8,
+		X1 = 16,
+		X2 = 32,
+		WheelUp = 64,
+		WheelDown = 128,
+		HorizontalWheelLeft = 256,
+		HorizontalWheelRight = 512,
 	}
 }

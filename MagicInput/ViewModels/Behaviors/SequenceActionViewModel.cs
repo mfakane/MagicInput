@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using MagicInput.Input.Behaviors;
 using MagicInput.Input.Behaviors.Actions;
 
 namespace MagicInput.ViewModels
@@ -9,7 +8,7 @@ namespace MagicInput.ViewModels
 	{
 		readonly Dictionary<Type, SequenceAction> actions = new Dictionary<Type, SequenceAction>();
 
-		public SequenceBehaviorViewModel Behavior { get; }
+		public KeyBehaviorViewModel Behavior { get; }
 
 		public SequenceAction Action
 		{
@@ -17,7 +16,7 @@ namespace MagicInput.ViewModels
 			private set
 			{
 				actions[value.GetType()] = SetValue(value);
-				value.Behavior = (SequenceBehavior)Behavior.Behavior;
+				value.Behavior = Behavior.Behavior;
 				RaisePropertyChanged(nameof(ActionType));
 			}
 		}
@@ -30,7 +29,7 @@ namespace MagicInput.ViewModels
 				: actions[value] = (SequenceAction)Activator.CreateInstance(value);
 		}
 
-		public SequenceActionViewModel(SequenceBehaviorViewModel behavior, SequenceAction action)
+		public SequenceActionViewModel(KeyBehaviorViewModel behavior, SequenceAction action)
 		{
 			Behavior = behavior;
 			Action = action;
