@@ -40,7 +40,7 @@ namespace MagicInput.ViewModels
 			{
 				KeyMaps =
 				{
-					new KeyMap("デフォルト"),
+					new KeyMap("デフォルト", DeviceSet.GetAllKeys()),
 				},
 			});
 			CollectionViewSource.GetDefaultView(Profiles).MoveCurrentTo(Profiles.Last());
