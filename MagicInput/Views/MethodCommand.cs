@@ -69,15 +69,15 @@ namespace MagicInput.Views
 
 			foreach (var i in sl.Take(sl.Length - 1))
 			{
-				var type = target.GetType();
+				var type = target?.GetType();
 
-				if (type.GetProperty(i) is PropertyInfo pi)
+				if (type?.GetProperty(i) is PropertyInfo pi)
 					target = pi.GetValue(target);
 				else
 					return (null, null);
 			}
 
-			return (target, target.GetType().GetMember(lastPrefix + sl.Last()).FirstOrDefault());
+			return target == null ? (null, null) : (target, target.GetType().GetMember(lastPrefix + sl.Last()).FirstOrDefault());
 		}
 	}
 }
