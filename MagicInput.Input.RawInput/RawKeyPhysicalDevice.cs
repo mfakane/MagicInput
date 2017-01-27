@@ -104,9 +104,7 @@ namespace MagicInput.Input.RawInput
 
 			static void Register(RawKeyDeviceHandle device)
 			{
-				if (!devices.Any())
-					StartHookServer();
-
+				StartHookServer();
 				devices.Add(device);
 			}
 
@@ -114,7 +112,12 @@ namespace MagicInput.Input.RawInput
 			{
 				devices.Remove(device);
 
-				if (devices.Any()) return;
+				if (devices.Any())
+				{
+					StopUnusedHookServer();
+
+					return;
+				}
 
 				StopHookServer();
 
@@ -127,41 +130,54 @@ namespace MagicInput.Input.RawInput
 
 			static void StartHookServer()
 			{
-				if (hookServer != null)
-					return;
+				StopUnusedHookServer();
 
-				mouseServer = new LowLevelMouseHandler();
-				hookServer = new InputHookServer();
-				mouseServer.PreviewInput += PreviewInputHandler;
-				mouseServer.Input += (sender, e) =>
+				if (mouseServer == null)
 				{
-					var rid = e.Input;
+					mouseServer = devices.Any(i => i.PhysicalDevice.Kind == KeyDeviceKind.Mouse) ? new LowLevelMouseHandler() : null;
 
-					e.Handled = OnKeyDown(rid);
-					OnKeyUp(rid);
-				};
+					if (mouseServer != null)
+					{
+						mouseServer.PreviewInput += PreviewInputHandler;
+						mouseServer.Input += (sender, e) =>
+						{
+							var rid = e.Input;
 
-				hookServer.DeviceConnected += (sender, e) =>
-				{
-					foreach (var i in devices)
-						if (i.PhysicalDevice.DevicePath == e.Device.DevicePath)
-							i.PhysicalDevice.RawDevice = e.Device;
-				};
-				hookServer.DeviceDisconnected += (sender, e) =>
-				{
-					foreach (var i in devices)
-						if (i.PhysicalDevice.Handle is IntPtr handle &&
-							handle == e.Handle)
-							i.PhysicalDevice.RawDevice = null;
-				};
-				hookServer.PreviewInput += PreviewInputHandler;
-				hookServer.Input += (sender, e) =>
-				{
-					var rid = e.Input;
+							e.Handled = OnKeyDown(rid);
+							OnKeyUp(rid);
+						};
+					}
+				}
 
-					e.Handled = OnKeyDown(rid);
-					OnKeyUp(rid);
-				};
+				if (hookServer == null)
+				{
+					hookServer = devices.Any(i => i.PhysicalDevice.Kind == KeyDeviceKind.Keyboard) ? new InputHookServer() : null;
+
+					if (hookServer != null)
+					{
+						hookServer.DeviceConnected += (sender, e) =>
+						{
+							foreach (var i in devices)
+								if (i.PhysicalDevice.DevicePath == e.Device.DevicePath)
+									i.PhysicalDevice.RawDevice = e.Device;
+						};
+						hookServer.DeviceDisconnected += (sender, e) =>
+						{
+							foreach (var i in devices)
+								if (i.PhysicalDevice.Handle is IntPtr handle &&
+									handle == e.Handle)
+									i.PhysicalDevice.RawDevice = null;
+						};
+						hookServer.PreviewInput += PreviewInputHandler;
+						hookServer.Input += (sender, e) =>
+						{
+							var rid = e.Input;
+
+							e.Handled = OnKeyDown(rid);
+							OnKeyUp(rid);
+						};
+					}
+				}
 
 				bool OnKeyDown(RawInputData rid)
 				{
@@ -260,6 +276,21 @@ namespace MagicInput.Input.RawInput
 						return new KeyData(physicalDevice, (rid.Keyboard.Flags & RawKeyboardFlags.Up) == 0, rid.Keyboard.ScanCode);
 					default:
 						return null;
+				}
+			}
+
+			static void StopUnusedHookServer()
+			{
+				if (mouseServer != null && !devices.Any(i => i.PhysicalDevice.Kind == KeyDeviceKind.Mouse))
+				{
+					mouseServer.Dispose();
+					mouseServer = null;
+				}
+
+				if (hookServer != null && !devices.Any(i => i.PhysicalDevice.Kind == KeyDeviceKind.Keyboard))
+				{
+					hookServer.Dispose();
+					hookServer = null;
 				}
 			}
 
