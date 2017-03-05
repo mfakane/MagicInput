@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Threading;
@@ -75,7 +76,7 @@ namespace MagicInput.Input.RawInput
 		readonly IntPtr hHook;
 		readonly HookProc hookDelegate;
 		readonly Thread readThread;
-		readonly BlockingCollection<(DateTime timeout, TaskCompletionSource<RawInputData> result, Func<RawInputData, bool> matches)> readRequest = new BlockingCollection<(DateTime timeout, TaskCompletionSource<RawInputData> result, Func<RawInputData, bool> matches)>();
+		readonly BlockingCollection<(TaskCompletionSource<RawInputData> result, Func<RawInputData, bool> matches)> readRequest = new BlockingCollection<(TaskCompletionSource<RawInputData> result, Func<RawInputData, bool> matches)>();
 		static Int32Point? prevPos;
 
 		public event EventHandler<RawInputEventArgs> PreviewInput;
@@ -148,13 +149,43 @@ namespace MagicInput.Input.RawInput
 
 		void ReadThread()
 		{
-			using (var f = new ReceiverWindow(readRequest))
+			using (var f = new ReceiverWindow())
 			{
 				RawInputDevice.RegisterDevice(HidUsageAndPage.Mouse, RawInputDeviceFlags.InputSink, f.Handle);
 
 				try
 				{
-					Application.Run();
+					var buffer = new List<(DateTime timeout, RawInputData rid)>();
+					var newBuffer = new List<(DateTime timeout, RawInputData rid)>();
+
+					while (true)
+					{
+						buffer.AddRange(RawInputData.GetBufferedData().Select(i => (DateTime.Now.AddMilliseconds(10), i)));
+
+						foreach (var i in buffer)
+							if (i.timeout > DateTime.Now)
+							{
+								var items = new List<(TaskCompletionSource<RawInputData> result, Func<RawInputData, bool> matches)>();
+
+								while (readRequest.TryTake(out var item))
+								{
+									if (item.matches(i.rid))
+										item.result.TrySetResult(i.rid);
+									else
+										newBuffer.Add(i);
+
+									if (item.result.Task.IsCanceled)
+										items.Add(item);
+								}
+
+								foreach (var j in items)
+									readRequest.Add(j);
+							}
+
+						(buffer, newBuffer) = (newBuffer, buffer);
+						newBuffer.Clear();
+						Thread.Sleep(1);
+					}
 				}
 				finally
 				{
@@ -165,11 +196,16 @@ namespace MagicInput.Input.RawInput
 
 		RawInputData ReadInput(int millisecondsTimeout, Func<RawInputData, bool> matches)
 		{
-			var tcs = new TaskCompletionSource<RawInputData>();
+			using (var cts = new CancellationTokenSource())
+			{
+				var tcs = new TaskCompletionSource<RawInputData>();
 
-			readRequest.Add((DateTime.Now.AddMilliseconds(millisecondsTimeout * 10), tcs, matches));
+				cts.Token.Register(() => tcs.TrySetCanceled());
+				cts.CancelAfter(millisecondsTimeout);
+				readRequest.Add((tcs, matches));
 
-			return tcs.Task.Wait(millisecondsTimeout) ? tcs.Task.Result : null;
+				return tcs.Task.ContinueWith(t => t.IsCanceled ? null : t.Result).Result;
+			}
 		}
 
 		static bool FlagMatches(RawMouse raw, MouseMessage msg, LowLevelMouseParameters data)
@@ -218,11 +254,8 @@ namespace MagicInput.Input.RawInput
 
 		sealed class ReceiverWindow : NativeWindow, IDisposable
 		{
-			readonly BlockingCollection<(DateTime timeout, TaskCompletionSource<RawInputData> result, Func<RawInputData, bool> matches)> buffer;
-
-			public ReceiverWindow(BlockingCollection<(DateTime timeout, TaskCompletionSource<RawInputData> result, Func<RawInputData, bool> matches)> buffer)
+			public ReceiverWindow()
 			{
-				this.buffer = buffer;
 				CreateHandle(new CreateParams
 				{
 					X = 0,
@@ -231,31 +264,6 @@ namespace MagicInput.Input.RawInput
 					Height = 0,
 					Style = 0x800000
 				});
-			}
-
-			protected override void WndProc(ref Message m)
-			{
-				switch (m.Msg)
-				{
-					case WM_INPUT:
-						{
-							var rid = RawInputData.FromHandle(m.LParam);
-							var items = new List<(DateTime timeout, TaskCompletionSource<RawInputData> result, Func<RawInputData, bool> matches)>();
-
-							while (buffer.TryTake(out var item))
-								if (item.matches(rid))
-									item.result.SetResult(rid);
-								else if (item.timeout > DateTime.Now)
-									items.Add(item);
-
-							foreach (var i in items)
-								buffer.Add(i);
-
-							break;
-						}
-				}
-
-				base.WndProc(ref m);
 			}
 
 			~ReceiverWindow() =>
