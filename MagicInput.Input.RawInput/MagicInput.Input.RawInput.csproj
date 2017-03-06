@@ -60,10 +60,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RawInputDeviceEventArgs.cs" />
     <Compile Include="RawInputEventArgs.cs" />
+    <Compile Include="RawKeyInputBase.cs" />
     <Compile Include="RawKeyProvider.cs" />
     <Compile Include="RawKeyInput.cs" />
     <Compile Include="RawKeyPhysicalDevice.cs" />
     <Compile Include="RawMouseButtonFlagsEx.cs" />
+    <Compile Include="RawMouseInput.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Linearstar.Core.Input\Linearstar.Core.Input\Linearstar.Core.Input.csproj">

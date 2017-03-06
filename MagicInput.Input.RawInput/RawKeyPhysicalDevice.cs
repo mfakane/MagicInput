@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Linearstar.Core.RawInput;
 using MagicInput.Input.Behaviors;
 
@@ -53,16 +52,16 @@ namespace MagicInput.Input.RawInput
 			RawDevice?.DeviceType == RawInputDeviceType.Mouse
 				? new KeyDevice(this, new[]
 				{
-					new RawKeyInput(RawKeyMouseButtons.Move),
-					new RawKeyInput(RawKeyMouseButtons.Left),
-					new RawKeyInput(RawKeyMouseButtons.Right),
-					new RawKeyInput(RawKeyMouseButtons.Middle),
-					new RawKeyInput(RawKeyMouseButtons.X1),
-					new RawKeyInput(RawKeyMouseButtons.X2),
-					new RawKeyInput(RawKeyMouseButtons.WheelUp),
-					new RawKeyInput(RawKeyMouseButtons.WheelDown),
-					new RawKeyInput(RawKeyMouseButtons.HorizontalWheelLeft),
-					new RawKeyInput(RawKeyMouseButtons.HorizontalWheelRight),
+					new RawMouseInput(RawMouseButtons.Move),
+					new RawMouseInput(RawMouseButtons.Left),
+					new RawMouseInput(RawMouseButtons.Right),
+					new RawMouseInput(RawMouseButtons.Middle),
+					new RawMouseInput(RawMouseButtons.X1),
+					new RawMouseInput(RawMouseButtons.X2),
+					new RawMouseInput(RawMouseButtons.WheelUp),
+					new RawMouseInput(RawMouseButtons.WheelDown),
+					new RawMouseInput(RawMouseButtons.HorizontalWheelLeft),
+					new RawMouseInput(RawMouseButtons.HorizontalWheelRight),
 				})
 				: base.CreateDevice();
 
@@ -193,30 +192,21 @@ namespace MagicInput.Input.RawInput
 											 .Where(i => i.Device?.PhysicalDevice is RawKeyPhysicalDevice rkpd
 													  && rkpd.IsConnected
 													  && rkpd.DevicePath == rid.Device?.DevicePath
-													  && i.Key is RawKeyInput rki
+													  && i.Key is RawKeyInputBase rki
 													  && rki.IsMatch(rid, false)))
 						{
-							var rki = (RawKeyInput)i.Key;
+							var rki = (RawKeyInputBase)i.Key;
 
 							activeBehaviors.Add(i);
 							handled = i.DoKeyDown(ToData(i.Device.PhysicalDevice, rid)) || handled;
-							rki.LastInput = DateTime.Now;
-
-							if ((rki.MouseButton & (RawKeyMouseButtons.Move | RawKeyMouseButtons.WheelUp | RawKeyMouseButtons.WheelDown | RawKeyMouseButtons.HorizontalWheelLeft | RawKeyMouseButtons.HorizontalWheelRight)) != 0)
-								Task.Run(async () =>
+							rki.OnKeyDown(() =>
+							{
+								lock (inputHookLock)
 								{
-									const int timeout = 50;
-									var time = DateTime.Now;
-
-									await Task.Delay(timeout).ConfigureAwait(false);
-
-									if (rki.LastInput <= time)
-										lock (inputHookLock)
-										{
-											i.DoKeyUp(ToData(i.Device.PhysicalDevice, rid));
-											activeBehaviors.Remove(i);
-										}
-								});
+									i.DoKeyUp(ToData(i.Device.PhysicalDevice, rid));
+									activeBehaviors.Remove(i);
+								}
+							});
 						}
 
 					return handled;
@@ -228,7 +218,7 @@ namespace MagicInput.Input.RawInput
 						foreach (var i in activeBehaviors.Where(i => i.Device.PhysicalDevice is RawKeyPhysicalDevice rkpd
 																  && rkpd.IsConnected
 																  && rkpd.DevicePath == rid.Device?.DevicePath
-																  && i.Key is RawKeyInput rki
+																  && i.Key is RawKeyInputBase rki
 																  && rki.IsMatch(rid, true))
 														 .ToArray())
 						{
@@ -245,7 +235,8 @@ namespace MagicInput.Input.RawInput
 						if (i.PreviewKeyInput != null &&
 							i.PhysicalDevice.DevicePath == rid.Device?.DevicePath)
 						{
-							var key = RawKeyInput.FromRawInputData(rid);
+							var key = (KeyInput)RawMouseInput.FromRawInputData(rid) ??
+												RawKeyInput.FromRawInputData(rid);
 
 							if (key == null)
 								continue;

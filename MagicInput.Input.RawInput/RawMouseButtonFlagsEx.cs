@@ -32,83 +32,83 @@ namespace MagicInput.Input.RawInput
 			return rt;
 		}
 
-		public static RawKeyMouseButtons ToRawKeyMouseButton(this RawMouseButtonFlags flags, int wheelDelta)
+		public static RawMouseButtons ToRawMouseButton(this RawMouseButtonFlags flags, int wheelDelta)
 		{
-			var rt = RawKeyMouseButtons.None;
+			var rt = RawMouseButtons.None;
 
 			if ((flags & (RawMouseButtonFlags.LeftButtonDown | RawMouseButtonFlags.LeftButtonUp)) != 0)
-				rt |= RawKeyMouseButtons.Left;
+				rt |= RawMouseButtons.Left;
 
 			if ((flags & (RawMouseButtonFlags.RightButtonDown | RawMouseButtonFlags.RightButtonUp)) != 0)
-				rt |= RawKeyMouseButtons.Right;
+				rt |= RawMouseButtons.Right;
 
 			if ((flags & (RawMouseButtonFlags.MiddleButtonDown | RawMouseButtonFlags.MiddleButtonUp)) != 0)
-				rt |= RawKeyMouseButtons.Middle;
+				rt |= RawMouseButtons.Middle;
 
 			if ((flags & (RawMouseButtonFlags.Button4Down | RawMouseButtonFlags.Button4Up)) != 0)
-				rt |= RawKeyMouseButtons.X1;
+				rt |= RawMouseButtons.X1;
 
 			if ((flags & (RawMouseButtonFlags.Button5Down | RawMouseButtonFlags.Button5Up)) != 0)
-				rt |= RawKeyMouseButtons.X2;
+				rt |= RawMouseButtons.X2;
 
 			if ((flags & RawMouseButtonFlags.MouseWheel) != 0)
-				rt |= wheelDelta > 0 ? RawKeyMouseButtons.WheelUp : RawKeyMouseButtons.WheelDown;
+				rt |= wheelDelta > 0 ? RawMouseButtons.WheelUp : RawMouseButtons.WheelDown;
 
 			if ((flags & RawMouseButtonFlags.MouseHorizontalWheel) != 0)
-				rt |= wheelDelta > 0 ? RawKeyMouseButtons.HorizontalWheelLeft : RawKeyMouseButtons.HorizontalWheelRight;
+				rt |= wheelDelta > 0 ? RawMouseButtons.HorizontalWheelLeft : RawMouseButtons.HorizontalWheelRight;
 
 			return rt;
 		}
 
-		public static RawKeyMouseButtons GetDownRawKeyMouseButton(this RawMouseButtonFlags flags, int wheelDelta, bool firstOnly = false)
+		public static RawMouseButtons GetDownRawMouseButton(this RawMouseButtonFlags flags, int wheelDelta, bool firstOnly = false)
 		{
-			var rt = RawKeyMouseButtons.None;
+			var rt = RawMouseButtons.None;
 
 			if ((flags & RawMouseButtonFlags.LeftButtonDown) != 0)
 			{
-				rt |= RawKeyMouseButtons.Left;
+				rt |= RawMouseButtons.Left;
 
 				if (firstOnly) return rt;
 			}
 
 			if ((flags & RawMouseButtonFlags.RightButtonDown) != 0)
 			{
-				rt |= RawKeyMouseButtons.Right;
+				rt |= RawMouseButtons.Right;
 
 				if (firstOnly) return rt;
 			}
 
 			if ((flags & RawMouseButtonFlags.MiddleButtonDown) != 0)
 			{
-				rt |= RawKeyMouseButtons.Middle;
+				rt |= RawMouseButtons.Middle;
 
 				if (firstOnly) return rt;
 			}
 
 			if ((flags & RawMouseButtonFlags.Button4Down) != 0)
 			{
-				rt |= RawKeyMouseButtons.X1;
+				rt |= RawMouseButtons.X1;
 
 				if (firstOnly) return rt;
 			}
 
 			if ((flags & RawMouseButtonFlags.Button5Down) != 0)
 			{
-				rt |= RawKeyMouseButtons.X2;
+				rt |= RawMouseButtons.X2;
 
 				if (firstOnly) return rt;
 			}
 
 			if ((flags & RawMouseButtonFlags.MouseWheel) != 0)
 			{
-				rt |= wheelDelta > 0 ? RawKeyMouseButtons.WheelUp : RawKeyMouseButtons.WheelDown;
+				rt |= wheelDelta > 0 ? RawMouseButtons.WheelUp : RawMouseButtons.WheelDown;
 
 				if (firstOnly) return rt;
 			}
 
 			if ((flags & RawMouseButtonFlags.MouseHorizontalWheel) != 0)
 			{
-				rt |= wheelDelta > 0 ? RawKeyMouseButtons.HorizontalWheelLeft : RawKeyMouseButtons.HorizontalWheelRight;
+				rt |= wheelDelta > 0 ? RawMouseButtons.HorizontalWheelLeft : RawMouseButtons.HorizontalWheelRight;
 
 				if (firstOnly) return rt;
 			}
