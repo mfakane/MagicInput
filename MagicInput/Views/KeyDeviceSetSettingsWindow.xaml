@@ -157,6 +157,7 @@
 											   Margin="0,0,0,4" />
 									</StackPanel>
 									<TextBox Text="ここにキー入力して追加"
+											 IsReadOnly="True"
 											 Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"
 											 Margin="0,0,0,8"
 											 Grid.ColumnSpan="2"
