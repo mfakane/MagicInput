@@ -39,7 +39,7 @@
 				 IsSynchronizedWithCurrentItem="True"
 				 Height="240">
 			<ListBox.ItemTemplate>
-				<DataTemplate DataType="m:VirtualKey">
+				<DataTemplate DataType="{x:Type in:VirtualKey}">
 					<StackPanel Orientation="Horizontal">
 						<TextBlock Text="{Binding StringFormat=X2, Converter={StaticResource Int32Converter}}"
 								   Width="24" />
